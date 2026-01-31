@@ -1,0 +1,1 @@
+export const TICK_RATE_MS = 1000; // 1s ticks (idle-friendly)
