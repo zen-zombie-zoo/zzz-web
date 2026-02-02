@@ -1,13 +1,13 @@
 import React, { createContext, useContext, useEffect, useMemo, useReducer } from "react";
 
-import { Animals, type AnimalId } from "./animals";
+import { Zombies, type ZombieId } from "./zombies";
 import { initialState } from "./state";
 import { applyTick, recalcDps, totalCostForQuantity, nextUnitCost } from "./economy";
 import { load, save, computeOfflineSeconds } from "./save";
 import { TICK_RATE_MS } from "./tick";
 import type { GameState } from "./types";
 
-type Action = { type: "LOAD"; state: GameState } | { type: "TICK"; seconds: number } | { type: "BUY_ANIMAL"; id: AnimalId; qty: number };
+type Action = { type: "LOAD"; state: GameState } | { type: "TICK"; seconds: number } | { type: "BUY_ANIMAL"; id: ZombieId; qty: number };
 
 function reducer(state: GameState, action: Action): GameState {
   switch (action.type) {
@@ -16,7 +16,7 @@ function reducer(state: GameState, action: Action): GameState {
     case "TICK":
       return applyTick(state, action.seconds);
     case "BUY_ANIMAL": {
-      const def = Animals[action.id];
+      const def = Zombies[action.id];
       const owned = state.generators[action.id]?.owned ?? 0;
       const cost = totalCostForQuantity(def, owned, action.qty);
       if (state.gold < cost) return state;
@@ -39,8 +39,8 @@ function reducer(state: GameState, action: Action): GameState {
 
 type Ctx = {
   state: GameState;
-  buyAnimal: (id: AnimalId, qty?: number) => void;
-  nextCost: (id: AnimalId) => ReturnType<typeof nextUnitCost>;
+  buyZombie: (id: ZombieId, qty?: number) => void;
+  nextCost: (id: ZombieId) => ReturnType<typeof nextUnitCost>;
 };
 
 const GameCtx = createContext<Ctx | null>(null);
@@ -82,8 +82,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const api = useMemo<Ctx>(
     () => ({
       state,
-      buyAnimal: (id, qty = 1) => dispatch({ type: "BUY_ANIMAL", id, qty }),
-      nextCost: id => nextUnitCost(Animals[id], state.generators[id]?.owned ?? 0)
+      buyZombie: (id, qty = 1) => dispatch({ type: "BUY_ANIMAL", id, qty }),
+      nextCost: id => nextUnitCost(Zombies[id], state.generators[id]?.owned ?? 0)
     }),
     [state]
   );

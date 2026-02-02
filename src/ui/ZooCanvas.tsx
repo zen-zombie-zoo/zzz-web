@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { Animals, type AnimalId } from "../game/animals";
+import { Zombies, type ZombieId } from "../game/zombies";
 import { useGame } from "../game/GameContext";
 
 type Props = {
@@ -8,7 +8,7 @@ type Props = {
 };
 
 type AnimalInstance = {
-  id: AnimalId;
+  id: ZombieId;
   x: number;
   y: number;
   vx: number;
@@ -21,20 +21,20 @@ const SPEED = 10;
 // Preload images
 const imageCache: Record<string, HTMLImageElement> = {};
 
-function getImage(id: AnimalId): HTMLImageElement | null {
+function getImage(id: ZombieId): HTMLImageElement | null {
   if (imageCache[id]) return imageCache[id];
 
   const img = new Image();
-  img.src = Animals[id].image;
+  img.src = Zombies[id].image;
   imageCache[id] = img;
 
   return img.complete ? img : null;
 }
 
 // Preload all images on module load
-(Object.keys(Animals) as AnimalId[]).forEach((id) => {
+(Object.keys(Zombies) as ZombieId[]).forEach((id) => {
   const img = new Image();
-  img.src = Animals[id].image;
+  img.src = Zombies[id].image;
   imageCache[id] = img;
 });
 
@@ -52,7 +52,7 @@ export const ZooCanvas: React.FC<Props> = ({ width = 800, height = 360 }) => {
     const existing = animalsRef.current;
     const newAnimals: AnimalInstance[] = [];
 
-    (Object.keys(Animals) as AnimalId[]).forEach((id) => {
+    (Object.keys(Zombies) as ZombieId[]).forEach((id) => {
       const owned = state.generators[id]?.owned ?? 0;
       const maxDraw = Math.min(owned, 30);
 
@@ -142,7 +142,7 @@ export const ZooCanvas: React.FC<Props> = ({ width = 800, height = 360 }) => {
           ctx.drawImage(img, animal.x, animal.y, ANIMAL_SIZE, ANIMAL_SIZE);
         } else {
           // Fallback to colored circle
-          ctx.fillStyle = Animals[animal.id].color;
+          ctx.fillStyle = Zombies[animal.id].color;
           ctx.beginPath();
           ctx.arc(
             animal.x + ANIMAL_SIZE / 2,

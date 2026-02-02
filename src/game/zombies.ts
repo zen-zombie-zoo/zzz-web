@@ -3,7 +3,7 @@ import giraffeImg from "../assets/kenney_animal-pack-redux/PNG/Round without det
 import penguinImg from "../assets/kenney_animal-pack-redux/PNG/Round without details/penguin.png";
 import elephantImg from "../assets/kenney_animal-pack-redux/PNG/Round without details/elephant.png";
 
-export const Animals = {
+export const Zombies = {
   monkey: {
     id: "monkey",
     name: "Monkey",
@@ -46,5 +46,5 @@ export const Animals = {
   },
 } as const;
 
-export type AnimalId = keyof typeof Animals;
-export type AnimalDefs = typeof Animals;
+export type ZombieId = keyof typeof Zombies;
+export type ZombieDefs = typeof Zombies;

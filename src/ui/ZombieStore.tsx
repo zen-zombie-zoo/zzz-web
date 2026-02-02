@@ -1,16 +1,15 @@
 import React from "react";
-import { Animals, type AnimalId } from "../game/animals";
+import { Zombies, type ZombieId } from "../game/zombies";
 import { useGame } from "../game/GameContext";
 import { nextUnitCost, totalCostForQuantity } from "../game/economy";
 
-export const AnimalStore: React.FC = () => {
-  const { state, buyAnimal } = useGame();
+export const ZombieStore: React.FC = () => {
+  const { state, buyZombie } = useGame();
 
   return (
     <div>
-      <h2>Animal Store</h2>
-      {(Object.keys(Animals) as AnimalId[]).map(id => {
-        const def = Animals[id];
+      {(Object.keys(Zombies) as ZombieId[]).map(id => {
+        const def = Zombies[id];
         const owned = state.generators[id]?.owned ?? 0;
         const cost1 = nextUnitCost(def, owned);
         const cost10 = totalCostForQuantity(def, owned, 10);
@@ -27,10 +26,10 @@ export const AnimalStore: React.FC = () => {
               <div className="small">Owned: {owned}</div>
             </div>
             <div>
-              <button onClick={() => buyAnimal(id, 1)} disabled={state.gold < cost1 || !unlocked}>
+              <button onClick={() => buyZombie(id, 1)} disabled={state.gold < cost1 || !unlocked}>
                 Buy 1 (${Math.floor(cost1)})
               </button>
-              <button onClick={() => buyAnimal(id, 10)} disabled={state.gold < cost10 || !unlocked}>
+              <button onClick={() => buyZombie(id, 10)} disabled={state.gold < cost10 || !unlocked}>
                 +10 (${Math.floor(cost10)})
               </button>
             </div>
