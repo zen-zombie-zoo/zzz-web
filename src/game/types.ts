@@ -36,12 +36,7 @@ export interface GameState {
   generators: Record<AnimalId, { owned: number }>;
   multipliers: {
     global: number;
-    prestige: number;
     perAnimal: Record<AnimalId, number>;
-  };
-  prestige: {
-    points: number;
-    totalResets: number;
   };
   lastSavedAt: number;
 }

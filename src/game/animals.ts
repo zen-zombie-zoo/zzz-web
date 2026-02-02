@@ -1,6 +1,3 @@
-
-// src/game/animals.ts
-
 export const Animals = {
   monkey: {
     id: 'monkey',

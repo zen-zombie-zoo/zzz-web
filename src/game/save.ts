@@ -37,6 +37,7 @@ export function load(): GameState | null {
 
 
 export function wipeSave() {
+  console.log("wiping")
   localStorage.removeItem(KEY);
 }
 

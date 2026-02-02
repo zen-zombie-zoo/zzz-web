@@ -16,10 +16,8 @@ function reducer(state: GameState, action: Action): GameState {
   switch (action.type) {
     case 'LOAD':
       return recalcDps(action.state);
-
     case 'TICK':
       return applyTick(state, action.seconds);
-
     case 'BUY_ANIMAL': {
       const def = Animals[action.id];
       const owned = state.generators[action.id]?.owned ?? 0;

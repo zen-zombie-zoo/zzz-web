@@ -1,11 +1,9 @@
-
-// src/ui/ZooCanvas.tsx
 import React, { useEffect, useRef } from 'react';
 import { Animals, type AnimalId } from '../game/animals';
 import { useGame } from '../game/GameContext';
 
 type Props = {
-  height?: number; // CSS pixels (logical)
+  height?: number;
 };
 
 export const ZooCanvas: React.FC<Props> = ({ height = 360 }) => {

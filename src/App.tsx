@@ -1,7 +1,8 @@
-import React from 'react';
-import { ResourcePanel } from './ui/ResourcePanel';
+import React from "react";
+import { ResourcePanel } from "./ui/ResourcePanel";
 // import { AnimalStore } from './ui/AnimalStore';
-import { ZooCanvas } from './ui/ZooCanvas';
+import { ZooCanvas } from "./ui/ZooCanvas";
+import { wipeSave } from "./game/save.ts";
 
 const App: React.FC = () => {
   return (
@@ -30,6 +31,11 @@ const App: React.FC = () => {
             </p>
           </div>
         </div>
+      </div>
+      <div className="grid" style={{ marginTop: 16 }}>
+        <button onClick={() => wipeSave()} style={{ width: "100px", height: "50px" }}>
+          Clear save
+        </button>
       </div>
     </div>
   );

@@ -1,14 +1,16 @@
 import React from 'react';
 
+import {useGame} from "../game/GameContext.tsx";
+
 export const ResourcePanel: React.FC = () => {
-  // const { state } = useGame();
+  const { state } = useGame();
 
   return (
     <div>
       <h2>Overview</h2>
       <div className="row">
         <div>Cash</div>
-        {/*<div className="accent">${fmt(state.gold, 2)}</div>*/}
+        <div className="accent">{state.gold}</div>
       </div>
       <div className="row">
         <div>Revenue</div>

@@ -1,4 +1,3 @@
-import type {D} from './numbers';
 import {type AnimalId, Animals} from './animals';
 import type {GameState, GeneratorDef} from './types';
 
@@ -39,7 +38,7 @@ export function recalcDps(s: GameState): GameState {
     total += withAnimalMult;
   }
 
-  total *= s.multipliers.global * s.multipliers.prestige;
+  total *= s.multipliers.global;
 
   return { ...s, goldPerSecond: total };
 }
