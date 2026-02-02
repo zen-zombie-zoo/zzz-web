@@ -1,43 +1,62 @@
 import React from "react";
 import { ResourcePanel } from "./ui/ResourcePanel";
-// import { AnimalStore } from './ui/AnimalStore';
 import { ZooCanvas } from "./ui/ZooCanvas";
-import { wipeSave } from "./game/save.ts";
+import { wipeSave } from "./game/save";
+import { AnimalStore } from "./ui/AnimalStore";
 
 const App: React.FC = () => {
   return (
-    <div className="container">
-      <h1>🦓 Idle Zoo</h1>
-      <p className="small">Earn cash from animals, expand your zoo, and watch it grow.</p>
-
-      <div className="panel" style={{ marginTop: 16 }}>
-        <ZooCanvas height={360} />
+    <>
+      <div
+        className="panel"
+        style={{
+          position: "fixed",
+          top: 16,
+          right: 16,
+          zIndex: 100,
+          minWidth: 180,
+        }}
+      >
+        <ResourcePanel />
       </div>
 
-      <div className="grid" style={{ marginTop: 16 }}>
-        <div className="panel">
-          <ResourcePanel />
-        </div>
+      <div style={{ display: "flex", justifyContent: "center", padding: 16 }}>
+        <ZooCanvas width={800} height={800} />
+      </div>
 
-        {/*<div className="panel">*/}
-        {/*  <AnimalStore />*/}
-        {/*</div>*/}
+      <div className="container">
+        <h1>🦓 Idle Zoo</h1>
+        <p className="small">
+          Earn cash from animals, expand your zoo, and watch it grow.
+        </p>
 
-        <div className="panel">
+        <div className="grid" style={{ marginTop: 16 }}>
+          <div className="panel">
+            <AnimalStore />
+          </div>
+          <div className="panel">
+            <div>
+              <h2>Tips</h2>
+              <p className="small">
+                Buy more animals to increase <strong>Revenue</strong>. New
+                species unlock as you progress.
+              </p>
+            </div>
+          </div>
           <div>
-            <h2>Tips</h2>
-            <p className="small">
-              Buy more animals to increase <strong>Revenue</strong>. New species unlock as you progress.
-            </p>
+            <button
+              onClick={() => {
+                wipeSave();
+                window.location.reload();
+              }}
+              style={{ width: "100px", height: "50px" }}
+            >
+              Clear save
+            </button>
           </div>
         </div>
       </div>
-      <div className="grid" style={{ marginTop: 16 }}>
-        <button onClick={() => wipeSave()} style={{ width: "100px", height: "50px" }}>
-          Clear save
-        </button>
-      </div>
-    </div>
+    </>
   );
 };
 

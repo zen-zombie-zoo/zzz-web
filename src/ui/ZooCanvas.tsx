@@ -1,127 +1,191 @@
-import React, { useEffect, useRef } from 'react';
-import { Animals, type AnimalId } from '../game/animals';
-import { useGame } from '../game/GameContext';
+import React, { useEffect, useRef } from "react";
+import { Animals, type AnimalId } from "../game/animals";
+import { useGame } from "../game/GameContext";
 
 type Props = {
+  width?: number;
   height?: number;
 };
 
-export const ZooCanvas: React.FC<Props> = ({ height = 360 }) => {
+type AnimalInstance = {
+  id: AnimalId;
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+};
+
+const ANIMAL_SIZE = 48;
+const SPEED = 10;
+
+// Preload images
+const imageCache: Record<string, HTMLImageElement> = {};
+
+function getImage(id: AnimalId): HTMLImageElement | null {
+  if (imageCache[id]) return imageCache[id];
+
+  const img = new Image();
+  img.src = Animals[id].image;
+  imageCache[id] = img;
+
+  return img.complete ? img : null;
+}
+
+// Preload all images on module load
+(Object.keys(Animals) as AnimalId[]).forEach((id) => {
+  const img = new Image();
+  img.src = Animals[id].image;
+  imageCache[id] = img;
+});
+
+export const ZooCanvas: React.FC<Props> = ({ width = 800, height = 360 }) => {
   const { state } = useGame();
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const rafRef = useRef<number | null>(null);
+  const animalsRef = useRef<AnimalInstance[]>([]);
+  const lastTimeRef = useRef<number>(performance.now());
+  const sizeRef = useRef({ W: 0, H: 0 });
 
+  // Sync animals when state changes (without restarting animation)
+  useEffect(() => {
+    const { W, H } = sizeRef.current;
+    const existing = animalsRef.current;
+    const newAnimals: AnimalInstance[] = [];
+
+    (Object.keys(Animals) as AnimalId[]).forEach((id) => {
+      const owned = state.generators[id]?.owned ?? 0;
+      const maxDraw = Math.min(owned, 30);
+
+      // Find existing animals of this type
+      const existingOfType = existing.filter((a) => a.id === id);
+
+      for (let i = 0; i < maxDraw; i++) {
+        if (existingOfType[i]) {
+          // Keep existing animal
+          newAnimals.push(existingOfType[i]);
+        } else {
+          // Create new animal at random position
+          const angle = Math.random() * Math.PI * 2;
+          newAnimals.push({
+            id,
+            x: ANIMAL_SIZE + Math.random() * Math.max(1, W - ANIMAL_SIZE * 2),
+            y: ANIMAL_SIZE + Math.random() * Math.max(1, H - ANIMAL_SIZE * 2),
+            vx: Math.cos(angle) * SPEED,
+            vy: Math.sin(angle) * SPEED,
+          });
+        }
+      }
+    });
+
+    animalsRef.current = newAnimals;
+  }, [state.generators]);
+
+  // Animation loop - only runs once on mount
   useEffect(() => {
     const canvas = canvasRef.current!;
-    const ctx = canvas.getContext('2d')!;
-
+    const ctx = canvas.getContext("2d")!;
     const dpr = window.devicePixelRatio || 1;
 
     function resize() {
       const rect = canvas.getBoundingClientRect();
+      sizeRef.current.W = rect.width;
+      sizeRef.current.H = rect.height;
       canvas.width = Math.max(1, Math.floor(rect.width * dpr));
       canvas.height = Math.max(1, Math.floor(rect.height * dpr));
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0); // draw in CSS pixels
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
 
     const observer = new ResizeObserver(resize);
     observer.observe(canvas);
 
-    function draw() {
-      const rect = canvas.getBoundingClientRect();
-      const W = rect.width;
-      const H = rect.height;
+    function update(dt: number) {
+      const { W, H } = sizeRef.current;
+      const animals = animalsRef.current;
+      const padding = 10;
 
-      // Clear
-      ctx.clearRect(0, 0, W, H);
-      ctx.fillStyle = '#0f0f12';
-      ctx.fillRect(0, 0, W, H);
+      for (const animal of animals) {
+        animal.x += animal.vx * dt;
+        animal.y += animal.vy * dt;
 
-      // Grid layout for animal boxes
-      const boxW = 110;
-      const boxH = 60;
-      const gap = 10;
-      const cols = Math.max(1, Math.floor((W - gap) / (boxW + gap)));
-
-      // Build a flat list of "instances" to draw
-      type Item = { color: string; label: string };
-      const items: Item[] = [];
-      (Object.keys(Animals) as AnimalId[]).forEach(id => {
-        const owned = state.generators[id]?.owned ?? 0;
-        const def = Animals[id];
-        // Cap drawn instances to prevent overload (show count badge instead)
-        const maxDraw = Math.min(owned, 50);
-        for (let i = 0; i < maxDraw; i++) {
-          items.push({ color: def.color, label: def.name });
+        // Bounce off walls
+        if (animal.x < padding) {
+          animal.x = padding;
+          animal.vx = Math.abs(animal.vx);
         }
-        // If we have more than maxDraw, add a "stack" indicator tile
-        if (owned > maxDraw) {
-          items.push({ color: def.color, label: `${def.name} x${owned - maxDraw + 1}` });
+        if (animal.x > W - ANIMAL_SIZE - padding) {
+          animal.x = W - ANIMAL_SIZE - padding;
+          animal.vx = -Math.abs(animal.vx);
         }
-      });
-
-      // Draw items
-      ctx.textBaseline = 'middle';
-      ctx.font = '12px system-ui, -apple-system, Segoe UI, Roboto, Arial';
-
-      items.forEach((it, idx) => {
-        const col = idx % cols;
-        const row = Math.floor(idx / cols);
-        const x = gap + col * (boxW + gap);
-        const y = gap + row * (boxH + gap);
-
-        if (y + boxH + gap > H) return; // clip if overflow
-
-        // Box
-        ctx.fillStyle = it.color;
-        roundRect(ctx, x, y, boxW, boxH, 8, true, false);
-
-        // Label
-        ctx.fillStyle = '#0f0f12';
-        ctx.fillText(it.label, x + 10, y + boxH / 2);
-      });
-
-      // Title overlay
-      ctx.fillStyle = 'rgba(255,255,255,0.6)';
-      ctx.font = '14px system-ui, -apple-system, Segoe UI, Roboto, Arial';
-      ctx.fillText('Your Zoo', 10, 18);
+        if (animal.y < padding + 20) {
+          animal.y = padding + 20;
+          animal.vy = Math.abs(animal.vy);
+        }
+        if (animal.y > H - ANIMAL_SIZE - padding) {
+          animal.y = H - ANIMAL_SIZE - padding;
+          animal.vy = -Math.abs(animal.vy);
+        }
+      }
     }
 
-    function loop() {
+    function draw() {
+      const { W, H } = sizeRef.current;
+      ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = "#0f0f12";
+      ctx.fillRect(0, 0, W, H);
+
+      // Draw animals
+      for (const animal of animalsRef.current) {
+        const img = getImage(animal.id);
+
+        // Draw image or fallback circle
+        if (img && img.complete) {
+          ctx.drawImage(img, animal.x, animal.y, ANIMAL_SIZE, ANIMAL_SIZE);
+        } else {
+          // Fallback to colored circle
+          ctx.fillStyle = Animals[animal.id].color;
+          ctx.beginPath();
+          ctx.arc(
+            animal.x + ANIMAL_SIZE / 2,
+            animal.y + ANIMAL_SIZE / 2,
+            ANIMAL_SIZE / 2,
+            0,
+            Math.PI * 2
+          );
+          ctx.fill();
+        }
+      }
+    }
+
+    function loop(time: number) {
+      const dt = Math.min((time - lastTimeRef.current) / 1000, 0.1);
+      lastTimeRef.current = time;
+
+      update(dt);
       draw();
       rafRef.current = requestAnimationFrame(loop);
     }
 
     resize();
-    loop();
+    rafRef.current = requestAnimationFrame(loop);
 
     return () => {
       if (rafRef.current != null) cancelAnimationFrame(rafRef.current);
       observer.disconnect();
     };
-  }, [state]);
+  }, []);
 
   return (
-    <div style={{ width: '100%', height }}>
-      <canvas ref={canvasRef} style={{ width: '100%', height: '100%', display: 'block', background: '#0f0f12' }} />
+    <div style={{ width, height }}>
+      <canvas
+        ref={canvasRef}
+        style={{
+          width: "100%",
+          height: "100%",
+          display: "block",
+          background: "#0f0f12",
+          borderRadius: 10,
+        }}
+      />
     </div>
   );
 };
-
-/** Utility to draw rounded rects */
-function roundRect(
-  ctx: CanvasRenderingContext2D,
-  x: number, y: number, w: number, h: number, r: number,
-  fill = true, stroke = false
-) {
-  r = Math.min(r, w / 2, h / 2);
-  ctx.beginPath();
-  ctx.moveTo(x + r, y);
-  ctx.arcTo(x + w, y, x + w, y + h, r);
-  ctx.arcTo(x + w, y + h, x, y + h, r);
-  ctx.arcTo(x, y + h, x, y, r);
-  ctx.arcTo(x, y, x + w, y, r);
-  ctx.closePath();
-  if (fill) ctx.fill();
-  if (stroke) ctx.stroke();
-}
