@@ -10,9 +10,9 @@ export const Zombies = {
     color: "#f59e0b",
     image: monkeyImg,
     baseCost: 10,
-    costGrowth: 1.15,
+    costGrowth: 1.25,
     baseProd: 1,
-    unlockAt: 0,
+    unlockAt: 0
   },
   giraffe: {
     id: "giraffe",
@@ -20,9 +20,9 @@ export const Zombies = {
     color: "#a78bfa",
     image: giraffeImg,
     baseCost: 150,
-    costGrowth: 1.15,
+    costGrowth: 1.5,
     baseProd: 8,
-    unlockAt: 100,
+    unlockAt: 100
   },
   penguin: {
     id: "penguin",
@@ -30,9 +30,9 @@ export const Zombies = {
     color: "#60a5fa",
     image: penguinImg,
     baseCost: 1500,
-    costGrowth: 1.15,
+    costGrowth: 1.75,
     baseProd: 50,
-    unlockAt: 1000,
+    unlockAt: 1000
   },
   elephant: {
     id: "elephant",
@@ -40,10 +40,10 @@ export const Zombies = {
     color: "#ef4444",
     image: elephantImg,
     baseCost: 7500,
-    costGrowth: 1.15,
+    costGrowth: 2,
     baseProd: 200,
-    unlockAt: 5000,
-  },
+    unlockAt: 5000
+  }
 } as const;
 
 export type ZombieId = keyof typeof Zombies;

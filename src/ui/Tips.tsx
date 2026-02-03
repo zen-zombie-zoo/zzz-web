@@ -4,8 +4,8 @@ export const Tips: React.FC = () => {
   return (
     <div>
       <p className="small" style={{ marginTop: 8 }}>
-        Grow your zombie collections to attract more zoo visitors and "earn" brains over time (in a totally legal way, of course). Use the brains to
-        buy more zombies and unlock new types!
+        Grow your zombie collections to attract more zoo visitors and "earn" brains over time (in a totally legal way, of course). Use the brains to buy more zombies and
+        unlock new types!
       </p>
 
       <h3 style={{ marginTop: 16 }}>Tips</h3>

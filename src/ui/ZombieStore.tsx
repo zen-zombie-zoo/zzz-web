@@ -1,6 +1,6 @@
 import React from "react";
 import { Zombies, type ZombieId } from "../game/zombies";
-import { useGame } from "../game/GameContext";
+import { useGame } from "../game/useGame";
 import { nextUnitCost, totalCostForQuantity } from "../game/economy";
 
 export const ZombieStore: React.FC = () => {

@@ -23,7 +23,7 @@ const App: React.FC = () => {
           zIndex: 100,
           display: "flex",
           gap: 12,
-          alignItems: "flex-start",
+          alignItems: "flex-start"
         }}
       >
         <button
@@ -35,7 +35,7 @@ const App: React.FC = () => {
             borderRadius: 10,
             display: "flex",
             alignItems: "center",
-            justifyContent: "center",
+            justifyContent: "center"
           }}
           title="Help & Tips"
         >
@@ -51,7 +51,7 @@ const App: React.FC = () => {
             borderRadius: 10,
             display: "flex",
             alignItems: "center",
-            justifyContent: "center",
+            justifyContent: "center"
           }}
           title="Store"
         >

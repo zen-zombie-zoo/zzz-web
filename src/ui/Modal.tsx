@@ -19,7 +19,7 @@ export const Modal: React.FC<Props> = ({ open, onClose, title, children }) => {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        zIndex: 200,
+        zIndex: 200
       }}
       onClick={onClose}
     >
@@ -29,16 +29,16 @@ export const Modal: React.FC<Props> = ({ open, onClose, title, children }) => {
           minWidth: 320,
           maxWidth: 480,
           maxHeight: "80vh",
-          overflow: "auto",
+          overflow: "auto"
         }}
-        onClick={(e) => e.stopPropagation()}
+        onClick={e => e.stopPropagation()}
       >
         <div
           style={{
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            marginBottom: 16,
+            marginBottom: 16
           }}
         >
           <h2 style={{ margin: 0 }}>{title}</h2>
@@ -49,7 +49,7 @@ export const Modal: React.FC<Props> = ({ open, onClose, title, children }) => {
               border: "none",
               fontSize: 20,
               cursor: "pointer",
-              color: "var(--muted)",
+              color: "var(--muted)"
             }}
           >
             ✕
