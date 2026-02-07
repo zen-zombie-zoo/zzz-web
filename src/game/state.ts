@@ -24,5 +24,6 @@ export const initialState = (): GameState => ({
   },
   lastSavedAt: Date.now(),
   money: 0,
-  visitorRate: 0
+  visitorRate: 0,
+  machineLevel: 0
 });

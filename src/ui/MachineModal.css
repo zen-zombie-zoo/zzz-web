@@ -1,0 +1,81 @@
+.machine-resources {
+  display: flex;
+  gap: var(--spacing-3xl);
+  margin-bottom: var(--spacing-2xl);
+}
+
+.machine-columns {
+  display: flex;
+  gap: var(--spacing-3xl);
+}
+
+.machine-column {
+  flex: 1;
+}
+
+.machine-section-title {
+  margin: 0 0 var(--spacing-lg) 0;
+  font-size: var(--font-size-md);
+}
+
+.zombie-item {
+  margin-bottom: var(--spacing-md);
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: var(--bg-card);
+  border-radius: var(--radius-sm);
+}
+
+.zombie-meta {
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.zombie-buttons {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.zombie-buy-button {
+  padding: var(--spacing-sm) 10px;
+  font-size: var(--font-size-sm);
+}
+
+.upgrade-card {
+  padding: var(--spacing-xl);
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+}
+
+.upgrade-card-maxed {
+  padding: var(--spacing-xl);
+  background: var(--color-success);
+  border-radius: var(--radius-md);
+  text-align: center;
+}
+
+.upgrade-card-maxed-subtitle {
+  margin-top: var(--spacing-xs);
+  font-size: var(--font-size-base);
+}
+
+.upgrade-next-title {
+  margin-bottom: var(--spacing-md);
+}
+
+.upgrade-unlocks {
+  margin-bottom: var(--spacing-lg);
+  color: var(--text-muted);
+}
+
+.upgrade-button {
+  width: 100%;
+  padding: var(--spacing-lg) var(--spacing-xl);
+  font-size: var(--font-size-md);
+}
+
+.upgrade-need-more {
+  margin-top: var(--spacing-md);
+  color: var(--color-danger);
+  font-size: var(--font-size-base);
+  text-align: center;
+}

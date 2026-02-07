@@ -13,4 +13,5 @@ export interface GameState {
   lastSavedAt: number;
   money: number;
   visitorRate: number;
+  machineLevel: number;
 }

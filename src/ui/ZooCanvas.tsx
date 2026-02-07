@@ -1,10 +1,14 @@
 import React, { useEffect, useRef } from "react";
 import { Zombies, type ZombieId } from "../game/zombies";
 import { useGame } from "../game/useGame";
+import { MAX_MACHINE_LEVEL } from "../game/machine";
+import { theme } from "../theme";
+import "./ZooCanvas.css";
 
 type Props = {
   width?: number;
   height?: number;
+  onMachineClick?: () => void;
 };
 
 type AnimalInstance = {
@@ -36,6 +40,8 @@ const SPEED = 10;
 const VISITOR_SPEED = 20;
 const VISITOR_MIN_LIFETIME = 15;
 const VISITOR_MAX_LIFETIME = 30;
+const MACHINE_SIZE = 64;
+const MACHINE_PADDING = 20;
 
 // Preload images
 const imageCache: Record<string, HTMLImageElement> = {};
@@ -57,8 +63,9 @@ function getImage(id: ZombieId): HTMLImageElement | null {
   imageCache[id] = img;
 });
 
-export const ZooCanvas: React.FC<Props> = ({ width = 800, height = 360 }) => {
+export const ZooCanvas: React.FC<Props> = ({ width = 800, height = 360, onMachineClick }) => {
   const { state, collectBrain } = useGame();
+  const machineLevelRef = useRef(state.machineLevel);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const rafRef = useRef<number | null>(null);
   const animalsRef = useRef<AnimalInstance[]>([]);
@@ -73,6 +80,11 @@ export const ZooCanvas: React.FC<Props> = ({ width = 800, height = 360 }) => {
   useEffect(() => {
     clickPowerRef.current = state.clickPower;
   }, [state.clickPower]);
+
+  // Keep machineLevel ref in sync
+  useEffect(() => {
+    machineLevelRef.current = state.machineLevel;
+  }, [state.machineLevel]);
 
   // Spawn visitors when money increases
   useEffect(() => {
@@ -105,16 +117,48 @@ export const ZooCanvas: React.FC<Props> = ({ width = 800, height = 360 }) => {
     const rect = canvas.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
+    const { W, H } = sizeRef.current;
 
-    collectBrain();
+    // Check if click is on the machine (bottom-right corner)
+    const machineX = W - MACHINE_SIZE - MACHINE_PADDING;
+    const machineY = H - MACHINE_SIZE - MACHINE_PADDING;
+    if (x >= machineX && x <= machineX + MACHINE_SIZE && y >= machineY && y <= machineY + MACHINE_SIZE) {
+      onMachineClick?.();
+      return;
+    }
 
-    // Add floating text
-    floatingTextsRef.current.push({
-      x,
-      y,
-      text: `+${clickPowerRef.current}`,
-      life: 1
-    });
+    // Check if click is on a visitor
+    const visitors = visitorsRef.current;
+    let clickedVisitorIndex = -1;
+
+    for (let i = 0; i < visitors.length; i++) {
+      const visitor = visitors[i];
+      const centerX = visitor.x + VISITOR_SIZE / 2;
+      const centerY = visitor.y + VISITOR_SIZE / 2;
+      const distance = Math.sqrt((x - centerX) ** 2 + (y - centerY) ** 2);
+
+      if (distance <= VISITOR_SIZE / 2) {
+        clickedVisitorIndex = i;
+        break;
+      }
+    }
+
+    // Only collect brain if a visitor was clicked
+    if (clickedVisitorIndex !== -1) {
+      const visitor = visitors[clickedVisitorIndex];
+      collectBrain();
+
+      // Add floating text at visitor position
+      floatingTextsRef.current.push({
+        x: visitor.x + VISITOR_SIZE / 2,
+        y: visitor.y,
+        text: `+${clickPowerRef.current}`,
+        life: 1
+      });
+
+      // Remove the clicked visitor
+      visitorsRef.current.splice(clickedVisitorIndex, 1);
+    }
   };
 
   // Sync animals when state changes (without restarting animation)
@@ -238,7 +282,7 @@ export const ZooCanvas: React.FC<Props> = ({ width = 800, height = 360 }) => {
     function draw() {
       const { W, H } = sizeRef.current;
       ctx.clearRect(0, 0, W, H);
-      ctx.fillStyle = "#0f0f12";
+      ctx.fillStyle = theme.bg;
       ctx.fillRect(0, 0, W, H);
 
       // Draw animals
@@ -259,7 +303,7 @@ export const ZooCanvas: React.FC<Props> = ({ width = 800, height = 360 }) => {
 
       // Draw visitors
       for (const visitor of visitorsRef.current) {
-        ctx.fillStyle = "#4ade80"; // Green color for visitors
+        ctx.fillStyle = theme.colorVisitor;
         ctx.beginPath();
         ctx.arc(
           visitor.x + VISITOR_SIZE / 2,
@@ -271,7 +315,7 @@ export const ZooCanvas: React.FC<Props> = ({ width = 800, height = 360 }) => {
         ctx.fill();
 
         // Add a simple face
-        ctx.fillStyle = "#1a1a1a";
+        ctx.fillStyle = theme.colorVisitorFace;
         // Eyes
         ctx.beginPath();
         ctx.arc(visitor.x + VISITOR_SIZE * 0.35, visitor.y + VISITOR_SIZE * 0.4, 2, 0, Math.PI * 2);
@@ -286,12 +330,66 @@ export const ZooCanvas: React.FC<Props> = ({ width = 800, height = 360 }) => {
       // Draw floating texts
       for (const text of floatingTextsRef.current) {
         ctx.globalAlpha = text.life;
-        ctx.fillStyle = "#f0a0d0";
+        ctx.fillStyle = theme.colorFloatingText;
         ctx.font = "bold 20px sans-serif";
         ctx.textAlign = "center";
         ctx.fillText(text.text, text.x, text.y);
       }
       ctx.globalAlpha = 1;
+
+      // Draw machine in bottom-right corner
+      const machineX = W - MACHINE_SIZE - MACHINE_PADDING;
+      const machineY = H - MACHINE_SIZE - MACHINE_PADDING;
+      const level = machineLevelRef.current;
+      const isMaxed = level >= MAX_MACHINE_LEVEL;
+
+      // Machine body
+      ctx.fillStyle = isMaxed ? theme.colorSuccess : theme.colorPrimary;
+      ctx.beginPath();
+      ctx.roundRect(machineX, machineY, MACHINE_SIZE, MACHINE_SIZE, 8);
+      ctx.fill();
+
+      // Machine border
+      ctx.strokeStyle = isMaxed ? theme.colorSuccessLight : theme.colorPrimaryLight;
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Level indicator dots
+      const dotSize = 6;
+      const dotSpacing = 12;
+      const totalDotsWidth = MAX_MACHINE_LEVEL * dotSize + (MAX_MACHINE_LEVEL - 1) * (dotSpacing - dotSize);
+      const dotsStartX = machineX + (MACHINE_SIZE - totalDotsWidth) / 2;
+      const dotsY = machineY + MACHINE_SIZE - 14;
+
+      for (let i = 0; i < MAX_MACHINE_LEVEL; i++) {
+        ctx.beginPath();
+        ctx.arc(dotsStartX + i * dotSpacing + dotSize / 2, dotsY, dotSize / 2, 0, Math.PI * 2);
+        ctx.fillStyle = i < level ? theme.colorWarning : theme.colorInactive;
+        ctx.fill();
+      }
+
+      // Machine icon (gear-like)
+      const centerX = machineX + MACHINE_SIZE / 2;
+      const centerY = machineY + MACHINE_SIZE / 2 - 6;
+      ctx.fillStyle = theme.colorGear;
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, 14, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = isMaxed ? theme.colorSuccess : theme.colorPrimary;
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, 6, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Draw gear teeth
+      ctx.fillStyle = theme.colorGear;
+      for (let i = 0; i < 6; i++) {
+        const angle = (i * Math.PI) / 3;
+        const toothX = centerX + Math.cos(angle) * 16;
+        const toothY = centerY + Math.sin(angle) * 16;
+        ctx.beginPath();
+        ctx.arc(toothX, toothY, 4, 0, Math.PI * 2);
+        ctx.fill();
+      }
     }
 
     function loop(time: number) {
@@ -315,18 +413,7 @@ export const ZooCanvas: React.FC<Props> = ({ width = 800, height = 360 }) => {
 
   return (
     <div style={{ width, height }}>
-      <canvas
-        ref={canvasRef}
-        onClick={handleClick}
-        style={{
-          width: "100%",
-          height: "100%",
-          display: "block",
-          background: "#0f0f12",
-          borderRadius: 10,
-          cursor: "pointer"
-        }}
-      />
+      <canvas ref={canvasRef} onClick={handleClick} className="zoo-canvas" />
     </div>
   );
 };

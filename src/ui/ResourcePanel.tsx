@@ -26,7 +26,7 @@ export const ResourcePanel: React.FC = () => {
       {state.visitorRate > 0 && (
         <div className="row">
           <div>Visitors:</div>
-          <div className="badge">{state.visitorRate.toFixed(1)} / sec</div>
+          <div className="badge">{state.visitorRate.toFixed(1)} visitors / sec</div>
         </div>
       )}
     </div>

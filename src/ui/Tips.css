@@ -1,0 +1,12 @@
+.tips-intro {
+  margin-top: var(--spacing-md);
+}
+
+.tips-heading {
+  margin-top: var(--spacing-xl);
+}
+
+.tips-list {
+  margin-top: var(--spacing-md);
+  padding-left: var(--spacing-2xl);
+}

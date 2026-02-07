@@ -9,6 +9,7 @@ export type GameCtxType = {
   nextCost: (id: ZombieId) => ReturnType<typeof nextUnitCost>;
   collectBrain: () => void;
   spawnVisitor: () => void;
+  upgradeMachine: () => void;
 };
 
 export const GameCtx = createContext<GameCtxType | null>(null);

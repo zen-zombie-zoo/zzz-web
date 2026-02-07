@@ -7,13 +7,15 @@ import { load, save, computeOfflineSeconds } from "./save";
 import { TICK_RATE_MS } from "./tick";
 import type { GameState } from "./types";
 import { GameCtx, type GameCtxType } from "./context";
+import { getNextUpgrade } from "./machine";
 
 type Action =
   | { type: "LOAD"; state: GameState }
   | { type: "TICK"; seconds: number }
   | { type: "BUY_ANIMAL"; id: ZombieId; qty: number }
   | { type: "CLICK" }
-  | { type: "SPAWN_VISITOR" };
+  | { type: "SPAWN_VISITOR" }
+  | { type: "UPGRADE_MACHINE" };
 
 function reducer(state: GameState, action: Action): GameState {
   switch (action.type) {
@@ -49,6 +51,16 @@ function reducer(state: GameState, action: Action): GameState {
         ...state,
         money: state.money + getEntryFee()
       };
+
+    case "UPGRADE_MACHINE": {
+      const upgrade = getNextUpgrade(state.machineLevel);
+      if (!upgrade || state.money < upgrade.cost) return state;
+      return {
+        ...state,
+        money: state.money - upgrade.cost,
+        machineLevel: upgrade.level
+      };
+    }
 
     default:
       return state;
@@ -112,7 +124,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       buyZombie: (id, qty = 1) => dispatch({ type: "BUY_ANIMAL", id, qty }),
       nextCost: id => nextUnitCost(Zombies[id], state.generators[id]?.owned ?? 0),
       collectBrain: () => dispatch({ type: "CLICK" }),
-      spawnVisitor: () => dispatch({ type: "SPAWN_VISITOR" })
+      spawnVisitor: () => dispatch({ type: "SPAWN_VISITOR" }),
+      upgradeMachine: () => dispatch({ type: "UPGRADE_MACHINE" })
     }),
     [state]
   );
