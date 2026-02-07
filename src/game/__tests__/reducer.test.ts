@@ -1,5 +1,5 @@
 import { initialState } from "../state";
-import { gameReducer } from "../GameContext";
+import { gameReducer } from "../reducer";
 import type { GameState } from "../types";
 
 describe("Game Reducer", () => {
