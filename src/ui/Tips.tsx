@@ -1,22 +1,58 @@
 import React from "react";
-import "./Tips.css";
+import styled from "@emotion/styled";
+import { theme } from "../theme";
+
+const Intro = styled.p`
+  margin-top: ${theme.spacingMd};
+  line-height: ${theme.lineHeightRelaxed};
+  color: ${theme.textMuted};
+  font-size: ${theme.fontSizeSm};
+`;
+
+const Heading = styled.h3`
+  margin-top: ${theme.spacingXl};
+  padding-top: ${theme.spacingXl};
+  border-top: 1px solid ${theme.borderSubtle};
+`;
+
+const List = styled.ul`
+  margin: ${theme.spacingLg} 0 0 0;
+  padding-left: ${theme.spacing2xl};
+  line-height: ${theme.lineHeightRelaxed};
+  color: ${theme.textMuted};
+  font-size: ${theme.fontSizeSm};
+
+  li {
+    margin-bottom: ${theme.spacingSm};
+  }
+
+  li::marker {
+    color: ${theme.colorAccent};
+  }
+`;
 
 export const Tips: React.FC = () => {
   return (
     <div>
-      <p className="small tips-intro">
-        Grow your zombie collections to attract more zoo visitors and "earn" brains over time (in a totally legal way, of course). Use the brains to buy more zombies and
-        unlock new types!
-      </p>
+      <Intro>
+        Grow your zombie collections to attract more zoo visitors and "earn"
+        brains over time (in a totally legal way, of course). Use the brains to
+        buy more zombies and unlock new types!
+      </Intro>
 
-      <h3 className="tips-heading">Tips</h3>
-      <ul className="small tips-list">
-        <li>Buy zombies to increase your brain production</li>
+      <Heading>Tips</Heading>
+      <List>
+        <li>
+          Buy zombies to increase your brain production, and attact more
+          visitors to your zoo
+        </li>
         <li>Each zombie type produces different amounts of brains per second</li>
-        <li>New zombie types unlock as you earn more brains</li>
+        <li>
+          New zombie types unlock when you upgrade the Zombieficator Machine
+        </li>
         <li>The game saves automatically every 5 seconds</li>
         <li>You earn offline progress when you return!</li>
-      </ul>
+      </List>
     </div>
   );
 };

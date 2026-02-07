@@ -1,13 +1,11 @@
 import React, { useEffect, useRef } from "react";
+import styled from "@emotion/styled";
 import { Zombies, type ZombieId } from "../game/zombies";
 import { useGame } from "../game/useGame";
 import { MAX_MACHINE_LEVEL } from "../game/machine";
 import { theme } from "../theme";
-import "./ZooCanvas.css";
 
 type Props = {
-  width?: number;
-  height?: number;
   onMachineClick?: () => void;
 };
 
@@ -24,14 +22,14 @@ type VisitorInstance = {
   y: number;
   vx: number;
   vy: number;
-  lifetime: number; // seconds remaining
+  lifetime: number;
 };
 
 type FloatingText = {
   x: number;
   y: number;
   text: string;
-  life: number; // 0-1, decreases over time
+  life: number;
 };
 
 const ANIMAL_SIZE = 48;
@@ -43,7 +41,28 @@ const VISITOR_MAX_LIFETIME = 30;
 const MACHINE_SIZE = 64;
 const MACHINE_PADDING = 20;
 
-// Preload images
+const Wrapper = styled.div`
+  width: 100%;
+  height: 100%;
+  padding: ${theme.spacingLg};
+  overflow: hidden;
+`;
+
+const Canvas = styled.canvas`
+  width: 100%;
+  height: 100%;
+  display: block;
+  background: ${theme.bg};
+  border-radius: ${theme.radiusXl};
+  cursor: pointer;
+  box-shadow: ${theme.shadowLg}, inset 0 0 0 1px ${theme.borderSubtle};
+  transition: box-shadow ${theme.transitionNormal};
+
+  &:hover {
+    box-shadow: ${theme.shadowLg}, inset 0 0 0 1px ${theme.borderDefault};
+  }
+`;
+
 const imageCache: Record<string, HTMLImageElement> = {};
 
 function getImage(id: ZombieId): HTMLImageElement | null {
@@ -56,14 +75,13 @@ function getImage(id: ZombieId): HTMLImageElement | null {
   return img.complete ? img : null;
 }
 
-// Preload all images on module load
 (Object.keys(Zombies) as ZombieId[]).forEach(id => {
   const img = new Image();
   img.src = Zombies[id].image;
   imageCache[id] = img;
 });
 
-export const ZooCanvas: React.FC<Props> = ({ width = 800, height = 360, onMachineClick }) => {
+export const ZooCanvas: React.FC<Props> = ({ onMachineClick }) => {
   const { state, collectBrain } = useGame();
   const machineLevelRef = useRef(state.machineLevel);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -76,35 +94,32 @@ export const ZooCanvas: React.FC<Props> = ({ width = 800, height = 360, onMachin
   const clickPowerRef = useRef(state.clickPower);
   const lastMoneyRef = useRef(state.money);
 
-  // Keep clickPower ref in sync
   useEffect(() => {
     clickPowerRef.current = state.clickPower;
   }, [state.clickPower]);
 
-  // Keep machineLevel ref in sync
   useEffect(() => {
     machineLevelRef.current = state.machineLevel;
   }, [state.machineLevel]);
 
-  // Spawn visitors when money increases
   useEffect(() => {
     const { W, H } = sizeRef.current;
     const moneyDiff = state.money - lastMoneyRef.current;
     lastMoneyRef.current = state.money;
 
     if (moneyDiff > 0) {
-      // Each $5 = one visitor
       const visitorsToSpawn = Math.floor(moneyDiff / 5);
       for (let i = 0; i < visitorsToSpawn; i++) {
         const angle = Math.random() * Math.PI * 2;
         const lifetime =
-          VISITOR_MIN_LIFETIME + Math.random() * (VISITOR_MAX_LIFETIME - VISITOR_MIN_LIFETIME);
+          VISITOR_MIN_LIFETIME +
+          Math.random() * (VISITOR_MAX_LIFETIME - VISITOR_MIN_LIFETIME);
         visitorsRef.current.push({
           x: VISITOR_SIZE + Math.random() * Math.max(1, W - VISITOR_SIZE * 2),
           y: VISITOR_SIZE + Math.random() * Math.max(1, H - VISITOR_SIZE * 2),
           vx: Math.cos(angle) * VISITOR_SPEED,
           vy: Math.sin(angle) * VISITOR_SPEED,
-          lifetime
+          lifetime,
         });
       }
     }
@@ -119,15 +134,18 @@ export const ZooCanvas: React.FC<Props> = ({ width = 800, height = 360, onMachin
     const y = e.clientY - rect.top;
     const { W, H } = sizeRef.current;
 
-    // Check if click is on the machine (bottom-right corner)
     const machineX = W - MACHINE_SIZE - MACHINE_PADDING;
     const machineY = H - MACHINE_SIZE - MACHINE_PADDING;
-    if (x >= machineX && x <= machineX + MACHINE_SIZE && y >= machineY && y <= machineY + MACHINE_SIZE) {
+    if (
+      x >= machineX &&
+      x <= machineX + MACHINE_SIZE &&
+      y >= machineY &&
+      y <= machineY + MACHINE_SIZE
+    ) {
       onMachineClick?.();
       return;
     }
 
-    // Check if click is on a visitor
     const visitors = visitorsRef.current;
     let clickedVisitorIndex = -1;
 
@@ -143,25 +161,21 @@ export const ZooCanvas: React.FC<Props> = ({ width = 800, height = 360, onMachin
       }
     }
 
-    // Only collect brain if a visitor was clicked
     if (clickedVisitorIndex !== -1) {
       const visitor = visitors[clickedVisitorIndex];
       collectBrain();
 
-      // Add floating text at visitor position
       floatingTextsRef.current.push({
         x: visitor.x + VISITOR_SIZE / 2,
         y: visitor.y,
         text: `+${clickPowerRef.current}`,
-        life: 1
+        life: 1,
       });
 
-      // Remove the clicked visitor
       visitorsRef.current.splice(clickedVisitorIndex, 1);
     }
   };
 
-  // Sync animals when state changes (without restarting animation)
   useEffect(() => {
     const { W, H } = sizeRef.current;
     const existing = animalsRef.current;
@@ -171,22 +185,19 @@ export const ZooCanvas: React.FC<Props> = ({ width = 800, height = 360, onMachin
       const owned = state.generators[id]?.owned ?? 0;
       const maxDraw = Math.min(owned, 30);
 
-      // Find existing animals of this type
       const existingOfType = existing.filter(a => a.id === id);
 
       for (let i = 0; i < maxDraw; i++) {
         if (existingOfType[i]) {
-          // Keep existing animal
           newAnimals.push(existingOfType[i]);
         } else {
-          // Create new animal at random position
           const angle = Math.random() * Math.PI * 2;
           newAnimals.push({
             id,
             x: ANIMAL_SIZE + Math.random() * Math.max(1, W - ANIMAL_SIZE * 2),
             y: ANIMAL_SIZE + Math.random() * Math.max(1, H - ANIMAL_SIZE * 2),
             vx: Math.cos(angle) * SPEED,
-            vy: Math.sin(angle) * SPEED
+            vy: Math.sin(angle) * SPEED,
           });
         }
       }
@@ -195,7 +206,6 @@ export const ZooCanvas: React.FC<Props> = ({ width = 800, height = 360, onMachin
     animalsRef.current = newAnimals;
   }, [state.generators]);
 
-  // Animation loop - only runs once on mount
   useEffect(() => {
     const canvas = canvasRef.current!;
     const ctx = canvas.getContext("2d")!;
@@ -223,7 +233,6 @@ export const ZooCanvas: React.FC<Props> = ({ width = 800, height = 360, onMachin
         animal.x += animal.vx * dt;
         animal.y += animal.vy * dt;
 
-        // Bounce off walls
         if (animal.x < padding) {
           animal.x = padding;
           animal.vx = Math.abs(animal.vx);
@@ -242,13 +251,11 @@ export const ZooCanvas: React.FC<Props> = ({ width = 800, height = 360, onMachin
         }
       }
 
-      // Update visitors
       for (const visitor of visitors) {
         visitor.x += visitor.vx * dt;
         visitor.y += visitor.vy * dt;
         visitor.lifetime -= dt;
 
-        // Bounce off walls
         if (visitor.x < padding) {
           visitor.x = padding;
           visitor.vx = Math.abs(visitor.vx);
@@ -266,16 +273,13 @@ export const ZooCanvas: React.FC<Props> = ({ width = 800, height = 360, onMachin
           visitor.vy = -Math.abs(visitor.vy);
         }
       }
-      // Remove expired visitors
       visitorsRef.current = visitors.filter(v => v.lifetime > 0);
 
-      // Update floating texts
       const texts = floatingTextsRef.current;
       for (const text of texts) {
-        text.life -= dt * 1.5; // Fade over ~0.67 seconds
-        text.y -= dt * 40; // Float upward
+        text.life -= dt * 1.5;
+        text.y -= dt * 40;
       }
-      // Remove dead texts
       floatingTextsRef.current = texts.filter(t => t.life > 0);
     }
 
@@ -285,23 +289,25 @@ export const ZooCanvas: React.FC<Props> = ({ width = 800, height = 360, onMachin
       ctx.fillStyle = theme.bg;
       ctx.fillRect(0, 0, W, H);
 
-      // Draw animals
       for (const animal of animalsRef.current) {
         const img = getImage(animal.id);
 
-        // Draw image or fallback circle
         if (img && img.complete) {
           ctx.drawImage(img, animal.x, animal.y, ANIMAL_SIZE, ANIMAL_SIZE);
         } else {
-          // Fallback to colored circle
           ctx.fillStyle = Zombies[animal.id].color;
           ctx.beginPath();
-          ctx.arc(animal.x + ANIMAL_SIZE / 2, animal.y + ANIMAL_SIZE / 2, ANIMAL_SIZE / 2, 0, Math.PI * 2);
+          ctx.arc(
+            animal.x + ANIMAL_SIZE / 2,
+            animal.y + ANIMAL_SIZE / 2,
+            ANIMAL_SIZE / 2,
+            0,
+            Math.PI * 2
+          );
           ctx.fill();
         }
       }
 
-      // Draw visitors
       for (const visitor of visitorsRef.current) {
         ctx.fillStyle = theme.colorVisitor;
         ctx.beginPath();
@@ -314,20 +320,34 @@ export const ZooCanvas: React.FC<Props> = ({ width = 800, height = 360, onMachin
         );
         ctx.fill();
 
-        // Add a simple face
         ctx.fillStyle = theme.colorVisitorFace;
-        // Eyes
         ctx.beginPath();
-        ctx.arc(visitor.x + VISITOR_SIZE * 0.35, visitor.y + VISITOR_SIZE * 0.4, 2, 0, Math.PI * 2);
-        ctx.arc(visitor.x + VISITOR_SIZE * 0.65, visitor.y + VISITOR_SIZE * 0.4, 2, 0, Math.PI * 2);
+        ctx.arc(
+          visitor.x + VISITOR_SIZE * 0.35,
+          visitor.y + VISITOR_SIZE * 0.4,
+          2,
+          0,
+          Math.PI * 2
+        );
+        ctx.arc(
+          visitor.x + VISITOR_SIZE * 0.65,
+          visitor.y + VISITOR_SIZE * 0.4,
+          2,
+          0,
+          Math.PI * 2
+        );
         ctx.fill();
-        // Smile
         ctx.beginPath();
-        ctx.arc(visitor.x + VISITOR_SIZE / 2, visitor.y + VISITOR_SIZE * 0.55, 4, 0, Math.PI);
+        ctx.arc(
+          visitor.x + VISITOR_SIZE / 2,
+          visitor.y + VISITOR_SIZE * 0.55,
+          4,
+          0,
+          Math.PI
+        );
         ctx.stroke();
       }
 
-      // Draw floating texts
       for (const text of floatingTextsRef.current) {
         ctx.globalAlpha = text.life;
         ctx.fillStyle = theme.colorFloatingText;
@@ -337,38 +357,42 @@ export const ZooCanvas: React.FC<Props> = ({ width = 800, height = 360, onMachin
       }
       ctx.globalAlpha = 1;
 
-      // Draw machine in bottom-right corner
       const machineX = W - MACHINE_SIZE - MACHINE_PADDING;
       const machineY = H - MACHINE_SIZE - MACHINE_PADDING;
       const level = machineLevelRef.current;
       const isMaxed = level >= MAX_MACHINE_LEVEL;
 
-      // Machine body
       ctx.fillStyle = isMaxed ? theme.colorSuccess : theme.colorPrimary;
       ctx.beginPath();
       ctx.roundRect(machineX, machineY, MACHINE_SIZE, MACHINE_SIZE, 8);
       ctx.fill();
 
-      // Machine border
-      ctx.strokeStyle = isMaxed ? theme.colorSuccessLight : theme.colorPrimaryLight;
+      ctx.strokeStyle = isMaxed
+        ? theme.colorSuccessLight
+        : theme.colorPrimaryLight;
       ctx.lineWidth = 2;
       ctx.stroke();
 
-      // Level indicator dots
       const dotSize = 6;
       const dotSpacing = 12;
-      const totalDotsWidth = MAX_MACHINE_LEVEL * dotSize + (MAX_MACHINE_LEVEL - 1) * (dotSpacing - dotSize);
+      const totalDotsWidth =
+        MAX_MACHINE_LEVEL * dotSize + (MAX_MACHINE_LEVEL - 1) * (dotSpacing - dotSize);
       const dotsStartX = machineX + (MACHINE_SIZE - totalDotsWidth) / 2;
       const dotsY = machineY + MACHINE_SIZE - 14;
 
       for (let i = 0; i < MAX_MACHINE_LEVEL; i++) {
         ctx.beginPath();
-        ctx.arc(dotsStartX + i * dotSpacing + dotSize / 2, dotsY, dotSize / 2, 0, Math.PI * 2);
+        ctx.arc(
+          dotsStartX + i * dotSpacing + dotSize / 2,
+          dotsY,
+          dotSize / 2,
+          0,
+          Math.PI * 2
+        );
         ctx.fillStyle = i < level ? theme.colorWarning : theme.colorInactive;
         ctx.fill();
       }
 
-      // Machine icon (gear-like)
       const centerX = machineX + MACHINE_SIZE / 2;
       const centerY = machineY + MACHINE_SIZE / 2 - 6;
       ctx.fillStyle = theme.colorGear;
@@ -380,7 +404,6 @@ export const ZooCanvas: React.FC<Props> = ({ width = 800, height = 360, onMachin
       ctx.arc(centerX, centerY, 6, 0, Math.PI * 2);
       ctx.fill();
 
-      // Draw gear teeth
       ctx.fillStyle = theme.colorGear;
       for (let i = 0; i < 6; i++) {
         const angle = (i * Math.PI) / 3;
@@ -412,8 +435,8 @@ export const ZooCanvas: React.FC<Props> = ({ width = 800, height = 360, onMachin
   }, []);
 
   return (
-    <div style={{ width, height }}>
-      <canvas ref={canvasRef} onClick={handleClick} className="zoo-canvas" />
-    </div>
+    <Wrapper>
+      <Canvas ref={canvasRef} onClick={handleClick} />
+    </Wrapper>
   );
 };
