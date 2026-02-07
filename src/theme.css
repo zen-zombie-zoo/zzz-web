@@ -1,42 +1,66 @@
 :root {
   /* Background colors */
-  --bg: #0f0f12;
-  --bg-panel: #17171c;
-  --bg-card: #1f2937;
-  --bg-button: #23232b;
-  --bg-overlay: rgba(0, 0, 0, 0.7);
+  --bg: #0a0a0d;
+  --bg-panel: #141419;
+  --bg-card: #1a1a22;
+  --bg-button: #252530;
+  --bg-button-hover: #2f2f3d;
+  --bg-button-active: #3a3a4a;
+  --bg-overlay: rgba(0, 0, 0, 0.75);
 
   /* Text colors */
-  --text-primary: #e7e7ef;
-  --text-muted: #9ca3af;
+  --text-primary: #f0f0f5;
+  --text-secondary: #c5c5d0;
+  --text-muted: #8888a0;
 
   /* Brand colors */
-  --color-primary: #6366f1;
-  --color-primary-light: #818cf8;
-  --color-accent: #6ee7b7;
+  --color-primary: #7c7cff;
+  --color-primary-hover: #9494ff;
+  --color-primary-light: #a5a5ff;
+  --color-accent: #5cffb1;
+  --color-accent-dim: rgba(92, 255, 177, 0.15);
 
   /* Status colors */
-  --color-success: #10b981;
-  --color-success-light: #34d399;
-  --color-warning: #fbbf24;
-  --color-danger: #ef4444;
-  --color-inactive: #374151;
+  --color-success: #22c992;
+  --color-success-light: #4aedb5;
+  --color-warning: #ffcc44;
+  --color-warning-dim: rgba(255, 204, 68, 0.15);
+  --color-danger: #ff5566;
+  --color-danger-dim: rgba(255, 85, 102, 0.1);
+  --color-inactive: #3a3a4a;
 
   /* Game-specific colors */
-  --color-visitor: #4ade80;
-  --color-floating-text: #f0a0d0;
+  --color-visitor: #5cff9f;
+  --color-floating-text: #ff99cc;
 
   /* Border colors */
-  --border-subtle: rgba(255, 255, 255, 0.04);
-  --border-button: rgba(255, 255, 255, 0.08);
+  --border-subtle: rgba(255, 255, 255, 0.06);
+  --border-default: rgba(255, 255, 255, 0.1);
+  --border-hover: rgba(255, 255, 255, 0.15);
+
+  /* Shadows */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --shadow-glow-primary: 0 0 20px rgba(124, 124, 255, 0.3);
+  --shadow-glow-accent: 0 0 20px rgba(92, 255, 177, 0.2);
+  --shadow-glow-success: 0 0 20px rgba(34, 201, 146, 0.3);
 
   /* Typography */
-  --font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu, Cantarell, "Noto Sans", Arial, sans-serif;
-  --font-size-xs: 12px;
+  --font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu, Cantarell, "Noto Sans", Arial, sans-serif;
+  --font-size-xs: 11px;
   --font-size-sm: 13px;
   --font-size-base: 14px;
   --font-size-md: 16px;
   --font-size-lg: 20px;
+  --font-size-xl: 28px;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --line-height-tight: 1.2;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.7;
 
   /* Spacing */
   --spacing-xs: 4px;
@@ -46,9 +70,16 @@
   --spacing-xl: 16px;
   --spacing-2xl: 20px;
   --spacing-3xl: 24px;
+  --spacing-4xl: 32px;
 
   /* Border radius */
   --radius-sm: 6px;
   --radius-md: 8px;
-  --radius-lg: 10px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-normal: 200ms ease;
+  --transition-slow: 300ms ease;
 }

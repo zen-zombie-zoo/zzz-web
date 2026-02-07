@@ -1,60 +1,42 @@
 import React, { useState } from "react";
-import { ResourcePanel } from "./ui/ResourcePanel";
+import { Header } from "./ui/Header";
 import { ZooCanvas } from "./ui/ZooCanvas";
-import { wipeSave } from "./game/save";
 import { Modal } from "./ui/Modal";
 import { Tips } from "./ui/Tips";
 import { MachineModal } from "./ui/MachineModal";
-import infoIcon from "./assets/info.svg";
+import { SettingsModal } from "./ui/SettingsModal";
 
 const App: React.FC = () => {
   const [tipsOpen, setTipsOpen] = useState(false);
   const [machineOpen, setMachineOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   return (
-    <>
-      {/* Top right UI */}
-      <div className="top-ui">
-        <button onClick={() => setTipsOpen(true)} className="icon-button" title="Help & Tips">
-          <img src={infoIcon} alt="Info" width={28} height={28} />
-        </button>
+    <div className="app">
+      <Header
+        onHelpClick={() => setTipsOpen(true)}
+        onSettingsClick={() => setSettingsOpen(true)}
+      />
 
-        <div className="panel resource-panel-wrapper">
-          <ResourcePanel />
-        </div>
-      </div>
+      <main className="main-content">
+        <ZooCanvas onMachineClick={() => setMachineOpen(true)} />
+      </main>
 
       {/* Tips Modal */}
-      <Modal open={tipsOpen} onClose={() => setTipsOpen(false)} title="Welcome to Zen Zombie Zoo!">
+      <Modal open={tipsOpen} onClose={() => setTipsOpen(false)} title="How to Play">
         <Tips />
       </Modal>
 
       {/* Machine Modal */}
-      <Modal open={machineOpen} onClose={() => setMachineOpen(false)} title="Zombie Machine">
+      <Modal open={machineOpen} onClose={() => setMachineOpen(false)} title="Zombieficator Machine">
         <MachineModal />
       </Modal>
 
-      {/* Zoo canvas */}
-      <div className="canvas-wrapper">
-        <ZooCanvas width={800} height={800} onMachineClick={() => setMachineOpen(true)} />
-      </div>
-
-      {/* Bottom UI */}
-      <div className="container">
-        <h1>Zen Zombie Zoo</h1>
-        <div className="bottom-ui">
-          <button
-            onClick={() => {
-              wipeSave();
-              window.location.reload();
-            }}
-            className="clear-save-button"
-          >
-            Clear save
-          </button>
-        </div>
-      </div>
-    </>
+      {/* Settings Modal */}
+      <Modal open={settingsOpen} onClose={() => setSettingsOpen(false)} title="Settings">
+        <SettingsModal />
+      </Modal>
+    </div>
   );
 };
 
