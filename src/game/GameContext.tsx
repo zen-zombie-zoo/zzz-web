@@ -17,7 +17,7 @@ type Action =
   | { type: "SPAWN_VISITOR" }
   | { type: "UPGRADE_MACHINE" };
 
-function reducer(state: GameState, action: Action): GameState {
+export function gameReducer(state: GameState, action: Action): GameState {
   switch (action.type) {
     case "LOAD":
       return recalcDps(action.state);
@@ -68,7 +68,7 @@ function reducer(state: GameState, action: Action): GameState {
 }
 
 export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [state, dispatch] = useReducer(reducer, undefined as unknown as GameState, () => {
+  const [state, dispatch] = useReducer(gameReducer, undefined as unknown as GameState, () => {
     const saved = load();
     return saved ?? initialState();
   });

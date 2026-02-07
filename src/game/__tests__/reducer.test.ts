@@ -1,47 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { initialState } from "../state";
-import { recalcDps, totalCostForQuantity, nextUnitCost, getEntryFee } from "../economy";
-import { Zombies } from "../zombies";
+import { gameReducer } from "../GameContext";
 import type { GameState } from "../types";
-
-// Manual reducer for testing (extract the reducer logic)
-function gameReducer(state: GameState, action: any): GameState {
-  switch (action.type) {
-    case "TICK":
-      return {
-        ...state,
-        gold: Math.round(state.gold + state.goldPerSecond * action.seconds)
-      };
-    case "BUY_ANIMAL": {
-      const def = Zombies[action.id];
-      const owned = state.generators[action.id]?.owned ?? 0;
-      const cost = totalCostForQuantity(def, owned, action.qty);
-      if (state.gold < cost) return state;
-
-      const newGenerators = { ...state.generators };
-      newGenerators[action.id] = { owned: owned + action.qty };
-
-      const s1: GameState = {
-        ...state,
-        gold: state.gold - cost,
-        generators: newGenerators
-      };
-      return recalcDps(s1);
-    }
-    case "CLICK":
-      return {
-        ...state,
-        gold: state.gold + state.clickPower
-      };
-    case "SPAWN_VISITOR":
-      return {
-        ...state,
-        money: state.money + getEntryFee()
-      };
-    default:
-      return state;
-  }
-}
 
 describe("Game Reducer", () => {
   describe("BUY_ANIMAL action", () => {
