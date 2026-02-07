@@ -30,7 +30,7 @@ jobs:
         run: npm run lint
 
       - name: Type check
-        run: npm run build -- --reporter=quiet
+        run: npm run build -- --noEmit
 
       - name: Test
         run: npm test -- --run
