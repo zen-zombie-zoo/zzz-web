@@ -1,6 +1,4 @@
-import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
-import React from "react";
 import { ResourcePanel } from "../ResourcePanel";
 import { GameCtx, type GameCtxType } from "../../game/context";
 import { initialState } from "../../game/state";
@@ -53,13 +51,14 @@ describe("ResourcePanel", () => {
 
   it("does not display visitor rate when 0", () => {
     const stateWithNoVisitors = { ...mockGameContext, state: { ...mockGameContext.state, visitorRate: 0 } };
-    const { container } = render(
+    render(
       <GameCtx.Provider value={stateWithNoVisitors}>
         <ResourcePanel />
       </GameCtx.Provider>
     );
-    const visitorElements = container.textContent?.match(/Visitors/);
-    expect(visitorElements).toBeNull();
+    // The visitor row should not exist when visitorRate is 0
+    const visitorLabels = screen.queryAllByText("Visitors");
+    expect(visitorLabels).toHaveLength(0);
   });
 
   it("formats large numbers with locale string", () => {

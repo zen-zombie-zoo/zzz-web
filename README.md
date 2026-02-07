@@ -15,8 +15,11 @@ An idle game where you grow a zombie collection to earn brains. Built with React
 - React 19
 - TypeScript
 - Vite
+- Emotion (CSS-in-JS)
 - HTML Canvas for animations
 - LocalStorage for save data
+- Vitest + React Testing Library (58 tests)
+- Semantic Release (automated versioning)
 
 ## Getting Started
 
@@ -39,6 +42,15 @@ npm run build
 
 # Preview production build
 npm run preview
+
+# Run tests
+npm test
+
+# Run tests with UI dashboard
+npm run test:ui
+
+# Generate coverage report
+npm run test:coverage
 ```
 
 ## How to Play
@@ -53,8 +65,8 @@ npm run preview
 
 ### Core Gameplay
 
-- [ ] Click mechanic - Click to manually collect brains
-- [ ] Upgrades system - Buy permanent production boosts
+- [x] Click mechanic - Click to manually collect brains
+- [x] Upgrades system - Buy permanent production boosts
 - [ ] More zombie types - Add more tiers (bear, crocodile, frog, etc.)
 
 ### Progression & Retention

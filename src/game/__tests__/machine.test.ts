@@ -1,4 +1,3 @@
-import { describe, it, expect } from "vitest";
 import { getNextUpgrade, isZombieUnlocked, MAX_MACHINE_LEVEL, MACHINE_UPGRADES } from "../machine";
 
 describe("Machine", () => {
