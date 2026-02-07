@@ -1,4 +1,3 @@
-import { describe, it, expect } from "vitest";
 import {
   totalCostForQuantity,
   nextUnitCost,
@@ -42,7 +41,6 @@ describe("Economy", () => {
 
     it("increases with ownership", () => {
       const def = Zombies.monkey;
-      const first = nextUnitCost(def, 0);
       const second = nextUnitCost(def, 1);
       expect(second).toBe(Math.floor(10 * 1.25));
     });

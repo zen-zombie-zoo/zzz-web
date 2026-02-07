@@ -1,4 +1,3 @@
-import { describe, it, expect } from "vitest";
 import { initialState } from "../state";
 import { gameReducer } from "../GameContext";
 import type { GameState } from "../types";
@@ -88,6 +87,51 @@ describe("Game Reducer", () => {
       const result = gameReducer(state, { type: "TICK", seconds: 10 });
       
       expect(result.gold).toBe(100 + 50);
+    });
+  });
+
+  describe("LOAD action", () => {
+    it("loads a saved state", () => {
+      const savedState: GameState = { ...initialState(), gold: 500, money: 250 };
+      const result = gameReducer(initialState(), { type: "LOAD", state: savedState });
+      
+      expect(result.gold).toBe(500);
+      expect(result.money).toBe(250);
+    });
+
+    it("recalculates DPS after loading", () => {
+      const savedState: GameState = {
+        ...initialState(),
+        generators: { ...initialState().generators, monkey: { owned: 10 } }
+      };
+      const result = gameReducer(initialState(), { type: "LOAD", state: savedState });
+      
+      expect(result.goldPerSecond).toBeGreaterThan(0);
+    });
+  });
+
+  describe("UPGRADE_MACHINE action", () => {
+    it("upgrades machine when enough money", () => {
+      const state = { ...initialState(), money: 1000, machineLevel: 0 };
+      const result = gameReducer(state, { type: "UPGRADE_MACHINE" });
+      
+      expect(result.machineLevel).toBeGreaterThan(0);
+      expect(result.money).toBeLessThan(1000);
+    });
+
+    it("does not upgrade when insufficient money", () => {
+      const state = { ...initialState(), money: 5, machineLevel: 0 };
+      const result = gameReducer(state, { type: "UPGRADE_MACHINE" });
+      
+      expect(result).toEqual(state);
+    });
+
+    it("does not upgrade when at max level", () => {
+      const state = { ...initialState(), money: 10000, machineLevel: 100 };
+      const result = gameReducer(state, { type: "UPGRADE_MACHINE" });
+      
+      // Should be unchanged if no more upgrades available
+      expect(result.machineLevel).toBe(100);
     });
   });
 
