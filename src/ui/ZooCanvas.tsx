@@ -2,26 +2,36 @@ import React, { useEffect, useRef } from "react";
 import styled from "@emotion/styled";
 import { Zombies, type ZombieId } from "../game/zombies";
 import { useGame } from "../game/useGame";
-import { MAX_MACHINE_LEVEL } from "../game/machine";
-import { theme } from "../theme";
+import { theme } from "../theme"; // Used for styled components
+import {
+  type Entity,
+  ANIMAL_SPEED,
+  VISITOR_SPEED,
+  createCardinalVelocity,
+  updateAnimalMovement,
+  updateVisitorMovement,
+} from "../game/movement";
+import {
+  ANIMAL_SIZE,
+  VISITOR_SIZE,
+  MACHINE_SIZE,
+  MACHINE_PADDING,
+  drawAnimal,
+  drawVisitor,
+  drawFloatingText,
+  drawMachine,
+  clearCanvas,
+} from "../game/renderer";
 
 type Props = {
   onMachineClick?: () => void;
 };
 
-type AnimalInstance = {
+type AnimalInstance = Entity & {
   id: ZombieId;
-  x: number;
-  y: number;
-  vx: number;
-  vy: number;
 };
 
-type VisitorInstance = {
-  x: number;
-  y: number;
-  vx: number;
-  vy: number;
+type VisitorInstance = Entity & {
   lifetime: number;
 };
 
@@ -32,14 +42,8 @@ type FloatingText = {
   life: number;
 };
 
-const ANIMAL_SIZE = 48;
-const VISITOR_SIZE = 24;
-const SPEED = 10;
-const VISITOR_SPEED = 20;
 const VISITOR_MIN_LIFETIME = 15;
 const VISITOR_MAX_LIFETIME = 30;
-const MACHINE_SIZE = 64;
-const MACHINE_PADDING = 20;
 
 const Wrapper = styled.div`
   width: 100%;
@@ -62,24 +66,6 @@ const Canvas = styled.canvas`
     box-shadow: ${theme.shadowLg}, inset 0 0 0 1px ${theme.borderDefault};
   }
 `;
-
-const imageCache: Record<string, HTMLImageElement> = {};
-
-function getImage(id: ZombieId): HTMLImageElement | null {
-  if (imageCache[id]) return imageCache[id];
-
-  const img = new Image();
-  img.src = Zombies[id].image;
-  imageCache[id] = img;
-
-  return img.complete ? img : null;
-}
-
-(Object.keys(Zombies) as ZombieId[]).forEach(id => {
-  const img = new Image();
-  img.src = Zombies[id].image;
-  imageCache[id] = img;
-});
 
 export const ZooCanvas: React.FC<Props> = ({ onMachineClick }) => {
   const { state, collectBrain } = useGame();
@@ -191,13 +177,12 @@ export const ZooCanvas: React.FC<Props> = ({ onMachineClick }) => {
         if (existingOfType[i]) {
           newAnimals.push(existingOfType[i]);
         } else {
-          const angle = Math.random() * Math.PI * 2;
+          const velocity = createCardinalVelocity(ANIMAL_SPEED);
           newAnimals.push({
             id,
             x: ANIMAL_SIZE + Math.random() * Math.max(1, W - ANIMAL_SIZE * 2),
             y: ANIMAL_SIZE + Math.random() * Math.max(1, H - ANIMAL_SIZE * 2),
-            vx: Math.cos(angle) * SPEED,
-            vy: Math.sin(angle) * SPEED,
+            ...velocity,
           });
         }
       }
@@ -227,51 +212,15 @@ export const ZooCanvas: React.FC<Props> = ({ onMachineClick }) => {
       const { W, H } = sizeRef.current;
       const animals = animalsRef.current;
       const visitors = visitorsRef.current;
-      const padding = 10;
+      const bounds = { width: W, height: H, padding: 10, topPadding: 30 };
 
       for (const animal of animals) {
-        animal.x += animal.vx * dt;
-        animal.y += animal.vy * dt;
-
-        if (animal.x < padding) {
-          animal.x = padding;
-          animal.vx = Math.abs(animal.vx);
-        }
-        if (animal.x > W - ANIMAL_SIZE - padding) {
-          animal.x = W - ANIMAL_SIZE - padding;
-          animal.vx = -Math.abs(animal.vx);
-        }
-        if (animal.y < padding + 20) {
-          animal.y = padding + 20;
-          animal.vy = Math.abs(animal.vy);
-        }
-        if (animal.y > H - ANIMAL_SIZE - padding) {
-          animal.y = H - ANIMAL_SIZE - padding;
-          animal.vy = -Math.abs(animal.vy);
-        }
+        updateAnimalMovement(animal, bounds, ANIMAL_SIZE, dt);
       }
 
       for (const visitor of visitors) {
-        visitor.x += visitor.vx * dt;
-        visitor.y += visitor.vy * dt;
+        updateVisitorMovement(visitor, bounds, VISITOR_SIZE, dt);
         visitor.lifetime -= dt;
-
-        if (visitor.x < padding) {
-          visitor.x = padding;
-          visitor.vx = Math.abs(visitor.vx);
-        }
-        if (visitor.x > W - VISITOR_SIZE - padding) {
-          visitor.x = W - VISITOR_SIZE - padding;
-          visitor.vx = -Math.abs(visitor.vx);
-        }
-        if (visitor.y < padding + 20) {
-          visitor.y = padding + 20;
-          visitor.vy = Math.abs(visitor.vy);
-        }
-        if (visitor.y > H - VISITOR_SIZE - padding) {
-          visitor.y = H - VISITOR_SIZE - padding;
-          visitor.vy = -Math.abs(visitor.vy);
-        }
       }
       visitorsRef.current = visitors.filter(v => v.lifetime > 0);
 
@@ -285,134 +234,23 @@ export const ZooCanvas: React.FC<Props> = ({ onMachineClick }) => {
 
     function draw() {
       const { W, H } = sizeRef.current;
-      ctx.clearRect(0, 0, W, H);
-      ctx.fillStyle = theme.bg;
-      ctx.fillRect(0, 0, W, H);
+      clearCanvas(ctx, W, H);
 
       for (const animal of animalsRef.current) {
-        const img = getImage(animal.id);
-
-        if (img && img.complete) {
-          ctx.drawImage(img, animal.x, animal.y, ANIMAL_SIZE, ANIMAL_SIZE);
-        } else {
-          ctx.fillStyle = Zombies[animal.id].color;
-          ctx.beginPath();
-          ctx.arc(
-            animal.x + ANIMAL_SIZE / 2,
-            animal.y + ANIMAL_SIZE / 2,
-            ANIMAL_SIZE / 2,
-            0,
-            Math.PI * 2
-          );
-          ctx.fill();
-        }
+        drawAnimal(ctx, animal.id, animal.x, animal.y);
       }
 
       for (const visitor of visitorsRef.current) {
-        ctx.fillStyle = theme.colorVisitor;
-        ctx.beginPath();
-        ctx.arc(
-          visitor.x + VISITOR_SIZE / 2,
-          visitor.y + VISITOR_SIZE / 2,
-          VISITOR_SIZE / 2,
-          0,
-          Math.PI * 2
-        );
-        ctx.fill();
-
-        ctx.fillStyle = theme.colorVisitorFace;
-        ctx.beginPath();
-        ctx.arc(
-          visitor.x + VISITOR_SIZE * 0.35,
-          visitor.y + VISITOR_SIZE * 0.4,
-          2,
-          0,
-          Math.PI * 2
-        );
-        ctx.arc(
-          visitor.x + VISITOR_SIZE * 0.65,
-          visitor.y + VISITOR_SIZE * 0.4,
-          2,
-          0,
-          Math.PI * 2
-        );
-        ctx.fill();
-        ctx.beginPath();
-        ctx.arc(
-          visitor.x + VISITOR_SIZE / 2,
-          visitor.y + VISITOR_SIZE * 0.55,
-          4,
-          0,
-          Math.PI
-        );
-        ctx.stroke();
+        drawVisitor(ctx, visitor.x, visitor.y);
       }
 
       for (const text of floatingTextsRef.current) {
-        ctx.globalAlpha = text.life;
-        ctx.fillStyle = theme.colorFloatingText;
-        ctx.font = "bold 20px sans-serif";
-        ctx.textAlign = "center";
-        ctx.fillText(text.text, text.x, text.y);
+        drawFloatingText(ctx, text.x, text.y, text.text, text.life);
       }
-      ctx.globalAlpha = 1;
 
       const machineX = W - MACHINE_SIZE - MACHINE_PADDING;
       const machineY = H - MACHINE_SIZE - MACHINE_PADDING;
-      const level = machineLevelRef.current;
-      const isMaxed = level >= MAX_MACHINE_LEVEL;
-
-      ctx.fillStyle = isMaxed ? theme.colorSuccess : theme.colorPrimary;
-      ctx.beginPath();
-      ctx.roundRect(machineX, machineY, MACHINE_SIZE, MACHINE_SIZE, 8);
-      ctx.fill();
-
-      ctx.strokeStyle = isMaxed
-        ? theme.colorSuccessLight
-        : theme.colorPrimaryLight;
-      ctx.lineWidth = 2;
-      ctx.stroke();
-
-      const dotSize = 6;
-      const dotSpacing = 12;
-      const totalDotsWidth =
-        MAX_MACHINE_LEVEL * dotSize + (MAX_MACHINE_LEVEL - 1) * (dotSpacing - dotSize);
-      const dotsStartX = machineX + (MACHINE_SIZE - totalDotsWidth) / 2;
-      const dotsY = machineY + MACHINE_SIZE - 14;
-
-      for (let i = 0; i < MAX_MACHINE_LEVEL; i++) {
-        ctx.beginPath();
-        ctx.arc(
-          dotsStartX + i * dotSpacing + dotSize / 2,
-          dotsY,
-          dotSize / 2,
-          0,
-          Math.PI * 2
-        );
-        ctx.fillStyle = i < level ? theme.colorWarning : theme.colorInactive;
-        ctx.fill();
-      }
-
-      const centerX = machineX + MACHINE_SIZE / 2;
-      const centerY = machineY + MACHINE_SIZE / 2 - 6;
-      ctx.fillStyle = theme.colorGear;
-      ctx.beginPath();
-      ctx.arc(centerX, centerY, 14, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = isMaxed ? theme.colorSuccess : theme.colorPrimary;
-      ctx.beginPath();
-      ctx.arc(centerX, centerY, 6, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.fillStyle = theme.colorGear;
-      for (let i = 0; i < 6; i++) {
-        const angle = (i * Math.PI) / 3;
-        const toothX = centerX + Math.cos(angle) * 16;
-        const toothY = centerY + Math.sin(angle) * 16;
-        ctx.beginPath();
-        ctx.arc(toothX, toothY, 4, 0, Math.PI * 2);
-        ctx.fill();
-      }
+      drawMachine(ctx, machineX, machineY, machineLevelRef.current);
     }
 
     function loop(time: number) {

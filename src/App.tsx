@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Header } from "./ui/Header";
 import { ZooCanvas } from "./ui/ZooCanvas";
 import { Modal } from "./ui/Modal";
@@ -13,14 +13,9 @@ const App: React.FC = () => {
   const [tipsOpen, setTipsOpen] = useState(false);
   const [machineOpen, setMachineOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const [earlyAccessOpen, setEarlyAccessOpen] = useState(false);
-
-  useEffect(() => {
-    const hasSeenEarlyAccess = localStorage.getItem(EARLY_ACCESS_KEY);
-    if (!hasSeenEarlyAccess) {
-      setEarlyAccessOpen(true);
-    }
-  }, []);
+  const [earlyAccessOpen, setEarlyAccessOpen] = useState(
+    () => !localStorage.getItem(EARLY_ACCESS_KEY)
+  );
 
   const handleEarlyAccessClose = () => {
     localStorage.setItem(EARLY_ACCESS_KEY, "true");
