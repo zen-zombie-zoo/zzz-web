@@ -1,9 +1,9 @@
 import {
-  ANIMAL_SIZE,
+  ZOMBIE_SIZE,
   VISITOR_SIZE,
   MACHINE_SIZE,
   MACHINE_PADDING,
-  drawAnimal,
+  drawZombie,
   drawVisitor,
   drawFloatingText,
   clearCanvas,
@@ -32,8 +32,8 @@ function createMockContext(): CanvasRenderingContext2D {
 
 describe("renderer", () => {
   describe("constants", () => {
-    it("defines ANIMAL_SIZE", () => {
-      expect(ANIMAL_SIZE).toBe(48);
+    it("defines ZOMBIE_SIZE", () => {
+      expect(ZOMBIE_SIZE).toBe(48);
     });
 
     it("defines VISITOR_SIZE", () => {
@@ -93,12 +93,12 @@ describe("renderer", () => {
   });
 
 
-  describe("drawAnimal", () => {
+  describe("drawZombie", () => {
     it("draws fallback circle when image not loaded", () => {
       const ctx = createMockContext();
 
       // Images won't be loaded in test environment
-      drawAnimal(ctx, "monkey", 100, 100);
+      drawZombie(ctx, "monkey", 100, 100);
 
       expect(ctx.beginPath).toHaveBeenCalled();
       expect(ctx.arc).toHaveBeenCalled();

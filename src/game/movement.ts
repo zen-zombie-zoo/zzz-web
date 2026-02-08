@@ -13,7 +13,7 @@ export type Bounds = {
 };
 
 // Movement constants
-export const ANIMAL_SPEED = 10;
+export const ZOMBIE_SPEED = 10;
 export const VISITOR_SPEED = 20;
 export const TURN_CHANCE_PER_SECOND = 0.5;
 
@@ -29,9 +29,9 @@ export function createCardinalVelocity(speed: number): { vx: number; vy: number 
 }
 
 /**
- * Updates an animal's position with cardinal movement and random turning
+ * Updates a zombie's position with cardinal movement and random turning
  */
-export function updateAnimalMovement(
+export function updateZombieMovement(
   entity: Entity,
   bounds: Bounds,
   entitySize: number,
@@ -51,41 +51,41 @@ export function updateAnimalMovement(
     if (vx > 0) {
       // Moving right: turn up or down
       entity.vx = 0;
-      entity.vy = turnRight ? ANIMAL_SPEED : -ANIMAL_SPEED;
+      entity.vy = turnRight ? ZOMBIE_SPEED : -ZOMBIE_SPEED;
     } else if (vx < 0) {
       // Moving left: turn down or up
       entity.vx = 0;
-      entity.vy = turnRight ? -ANIMAL_SPEED : ANIMAL_SPEED;
+      entity.vy = turnRight ? -ZOMBIE_SPEED : ZOMBIE_SPEED;
     } else if (vy > 0) {
       // Moving down: turn left or right
       entity.vy = 0;
-      entity.vx = turnRight ? -ANIMAL_SPEED : ANIMAL_SPEED;
+      entity.vx = turnRight ? -ZOMBIE_SPEED : ZOMBIE_SPEED;
     } else if (vy < 0) {
       // Moving up: turn right or left
       entity.vy = 0;
-      entity.vx = turnRight ? ANIMAL_SPEED : -ANIMAL_SPEED;
+      entity.vx = turnRight ? ZOMBIE_SPEED : -ZOMBIE_SPEED;
     }
   }
 
   // Bounce off walls (cardinal direction only)
   if (entity.x < padding) {
     entity.x = padding;
-    entity.vx = ANIMAL_SPEED;
+    entity.vx = ZOMBIE_SPEED;
     entity.vy = 0;
   }
   if (entity.x > width - entitySize - padding) {
     entity.x = width - entitySize - padding;
-    entity.vx = -ANIMAL_SPEED;
+    entity.vx = -ZOMBIE_SPEED;
     entity.vy = 0;
   }
   if (entity.y < topPadding) {
     entity.y = topPadding;
-    entity.vy = ANIMAL_SPEED;
+    entity.vy = ZOMBIE_SPEED;
     entity.vx = 0;
   }
   if (entity.y > height - entitySize - padding) {
     entity.y = height - entitySize - padding;
-    entity.vy = -ANIMAL_SPEED;
+    entity.vy = -ZOMBIE_SPEED;
     entity.vx = 0;
   }
 }

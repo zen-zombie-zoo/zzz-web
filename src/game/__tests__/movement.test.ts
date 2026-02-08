@@ -1,17 +1,17 @@
 import {
   type Entity,
   type Bounds,
-  ANIMAL_SPEED,
+  ZOMBIE_SPEED,
   VISITOR_SPEED,
   createCardinalVelocity,
-  updateAnimalMovement,
+  updateZombieMovement,
   updateVisitorMovement,
 } from "../movement";
 
 describe("movement", () => {
   describe("constants", () => {
-    it("defines ANIMAL_SPEED", () => {
-      expect(ANIMAL_SPEED).toBe(10);
+    it("defines ZOMBIE_SPEED", () => {
+      expect(ZOMBIE_SPEED).toBe(10);
     });
 
     it("defines VISITOR_SPEED", () => {
@@ -57,7 +57,7 @@ describe("movement", () => {
     });
   });
 
-  describe("updateAnimalMovement", () => {
+  describe("updateZombieMovement", () => {
     const bounds: Bounds = {
       width: 800,
       height: 600,
@@ -67,28 +67,28 @@ describe("movement", () => {
     const entitySize = 48;
 
     it("updates position based on velocity and dt", () => {
-      const entity: Entity = { x: 100, y: 100, vx: ANIMAL_SPEED, vy: 0 };
+      const entity: Entity = { x: 100, y: 100, vx: ZOMBIE_SPEED, vy: 0 };
       const originalX = entity.x;
 
       // Mock Math.random to prevent turning
       const mockRandom = vi.spyOn(Math, "random").mockReturnValue(1);
 
-      updateAnimalMovement(entity, bounds, entitySize, 1);
+      updateZombieMovement(entity, bounds, entitySize, 1);
 
-      expect(entity.x).toBe(originalX + ANIMAL_SPEED);
+      expect(entity.x).toBe(originalX + ZOMBIE_SPEED);
       expect(entity.y).toBe(100);
 
       mockRandom.mockRestore();
     });
 
     it("bounces off left wall", () => {
-      const entity: Entity = { x: 5, y: 100, vx: -ANIMAL_SPEED, vy: 0 };
+      const entity: Entity = { x: 5, y: 100, vx: -ZOMBIE_SPEED, vy: 0 };
       vi.spyOn(Math, "random").mockReturnValue(1);
 
-      updateAnimalMovement(entity, bounds, entitySize, 0.1);
+      updateZombieMovement(entity, bounds, entitySize, 0.1);
 
       expect(entity.x).toBe(bounds.padding);
-      expect(entity.vx).toBe(ANIMAL_SPEED);
+      expect(entity.vx).toBe(ZOMBIE_SPEED);
       expect(entity.vy).toBe(0);
 
       vi.restoreAllMocks();
@@ -98,28 +98,28 @@ describe("movement", () => {
       const entity: Entity = {
         x: bounds.width - entitySize - 5,
         y: 100,
-        vx: ANIMAL_SPEED,
+        vx: ZOMBIE_SPEED,
         vy: 0,
       };
       vi.spyOn(Math, "random").mockReturnValue(1);
 
-      updateAnimalMovement(entity, bounds, entitySize, 0.1);
+      updateZombieMovement(entity, bounds, entitySize, 0.1);
 
       expect(entity.x).toBe(bounds.width - entitySize - bounds.padding);
-      expect(entity.vx).toBe(-ANIMAL_SPEED);
+      expect(entity.vx).toBe(-ZOMBIE_SPEED);
       expect(entity.vy).toBe(0);
 
       vi.restoreAllMocks();
     });
 
     it("bounces off top wall", () => {
-      const entity: Entity = { x: 100, y: 25, vx: 0, vy: -ANIMAL_SPEED };
+      const entity: Entity = { x: 100, y: 25, vx: 0, vy: -ZOMBIE_SPEED };
       vi.spyOn(Math, "random").mockReturnValue(1);
 
-      updateAnimalMovement(entity, bounds, entitySize, 0.1);
+      updateZombieMovement(entity, bounds, entitySize, 0.1);
 
       expect(entity.y).toBe(bounds.topPadding);
-      expect(entity.vy).toBe(ANIMAL_SPEED);
+      expect(entity.vy).toBe(ZOMBIE_SPEED);
       expect(entity.vx).toBe(0);
 
       vi.restoreAllMocks();
@@ -130,24 +130,24 @@ describe("movement", () => {
         x: 100,
         y: bounds.height - entitySize - 5,
         vx: 0,
-        vy: ANIMAL_SPEED,
+        vy: ZOMBIE_SPEED,
       };
       vi.spyOn(Math, "random").mockReturnValue(1);
 
-      updateAnimalMovement(entity, bounds, entitySize, 0.1);
+      updateZombieMovement(entity, bounds, entitySize, 0.1);
 
       expect(entity.y).toBe(bounds.height - entitySize - bounds.padding);
-      expect(entity.vy).toBe(-ANIMAL_SPEED);
+      expect(entity.vy).toBe(-ZOMBIE_SPEED);
       expect(entity.vx).toBe(0);
 
       vi.restoreAllMocks();
     });
 
     it("maintains cardinal movement after wall bounce", () => {
-      const entity: Entity = { x: 5, y: 100, vx: -ANIMAL_SPEED, vy: 0 };
+      const entity: Entity = { x: 5, y: 100, vx: -ZOMBIE_SPEED, vy: 0 };
       vi.spyOn(Math, "random").mockReturnValue(1);
 
-      updateAnimalMovement(entity, bounds, entitySize, 0.1);
+      updateZombieMovement(entity, bounds, entitySize, 0.1);
 
       // Should only move in one direction after bounce
       const isCardinal =

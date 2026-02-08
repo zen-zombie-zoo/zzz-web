@@ -5,18 +5,18 @@ import { useGame } from "../game/useGame";
 import { theme } from "../theme"; // Used for styled components
 import {
   type Entity,
-  ANIMAL_SPEED,
+  ZOMBIE_SPEED,
   VISITOR_SPEED,
   createCardinalVelocity,
-  updateAnimalMovement,
+  updateZombieMovement,
   updateVisitorMovement,
 } from "../game/movement";
 import {
-  ANIMAL_SIZE,
+  ZOMBIE_SIZE,
   VISITOR_SIZE,
   MACHINE_SIZE,
   MACHINE_PADDING,
-  drawAnimal,
+  drawZombie,
   drawVisitor,
   drawFloatingText,
   drawMachine,
@@ -27,7 +27,7 @@ type Props = {
   onMachineClick?: () => void;
 };
 
-type AnimalInstance = Entity & {
+type ZombieInstance = Entity & {
   id: ZombieId;
 };
 
@@ -72,7 +72,7 @@ export const ZooCanvas: React.FC<Props> = ({ onMachineClick }) => {
   const machineLevelRef = useRef(state.machineLevel);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const rafRef = useRef<number | null>(null);
-  const animalsRef = useRef<AnimalInstance[]>([]);
+  const zombiesRef = useRef<ZombieInstance[]>([]);
   const visitorsRef = useRef<VisitorInstance[]>([]);
   const floatingTextsRef = useRef<FloatingText[]>([]);
   const lastTimeRef = useRef<number>(0);
@@ -164,31 +164,31 @@ export const ZooCanvas: React.FC<Props> = ({ onMachineClick }) => {
 
   useEffect(() => {
     const { W, H } = sizeRef.current;
-    const existing = animalsRef.current;
-    const newAnimals: AnimalInstance[] = [];
+    const existing = zombiesRef.current;
+    const newZombies: ZombieInstance[] = [];
 
     (Object.keys(Zombies) as ZombieId[]).forEach(id => {
       const owned = state.generators[id]?.owned ?? 0;
       const maxDraw = Math.min(owned, 30);
 
-      const existingOfType = existing.filter(a => a.id === id);
+      const existingOfType = existing.filter(z => z.id === id);
 
       for (let i = 0; i < maxDraw; i++) {
         if (existingOfType[i]) {
-          newAnimals.push(existingOfType[i]);
+          newZombies.push(existingOfType[i]);
         } else {
-          const velocity = createCardinalVelocity(ANIMAL_SPEED);
-          newAnimals.push({
+          const velocity = createCardinalVelocity(ZOMBIE_SPEED);
+          newZombies.push({
             id,
-            x: ANIMAL_SIZE + Math.random() * Math.max(1, W - ANIMAL_SIZE * 2),
-            y: ANIMAL_SIZE + Math.random() * Math.max(1, H - ANIMAL_SIZE * 2),
+            x: ZOMBIE_SIZE + Math.random() * Math.max(1, W - ZOMBIE_SIZE * 2),
+            y: ZOMBIE_SIZE + Math.random() * Math.max(1, H - ZOMBIE_SIZE * 2),
             ...velocity,
           });
         }
       }
     });
 
-    animalsRef.current = newAnimals;
+    zombiesRef.current = newZombies;
   }, [state.generators]);
 
   useEffect(() => {
@@ -210,12 +210,12 @@ export const ZooCanvas: React.FC<Props> = ({ onMachineClick }) => {
 
     function update(dt: number) {
       const { W, H } = sizeRef.current;
-      const animals = animalsRef.current;
+      const zombies = zombiesRef.current;
       const visitors = visitorsRef.current;
       const bounds = { width: W, height: H, padding: 10, topPadding: 30 };
 
-      for (const animal of animals) {
-        updateAnimalMovement(animal, bounds, ANIMAL_SIZE, dt);
+      for (const zombie of zombies) {
+        updateZombieMovement(zombie, bounds, ZOMBIE_SIZE, dt);
       }
 
       for (const visitor of visitors) {
@@ -236,8 +236,8 @@ export const ZooCanvas: React.FC<Props> = ({ onMachineClick }) => {
       const { W, H } = sizeRef.current;
       clearCanvas(ctx, W, H);
 
-      for (const animal of animalsRef.current) {
-        drawAnimal(ctx, animal.id, animal.x, animal.y);
+      for (const zombie of zombiesRef.current) {
+        drawZombie(ctx, zombie.id, zombie.x, zombie.y);
       }
 
       for (const visitor of visitorsRef.current) {

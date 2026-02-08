@@ -3,7 +3,7 @@ import { MAX_MACHINE_LEVEL } from "./machine";
 import { theme } from "../theme";
 
 // Entity sizes
-export const ANIMAL_SIZE = 48;
+export const ZOMBIE_SIZE = 48;
 export const VISITOR_SIZE = 24;
 export const MACHINE_SIZE = 64;
 export const MACHINE_PADDING = 20;
@@ -29,9 +29,9 @@ function getImage(id: ZombieId): HTMLImageElement | null {
 });
 
 /**
- * Draws an animal (zombie) on the canvas
+ * Draws a zombie on the canvas
  */
-export function drawAnimal(
+export function drawZombie(
   ctx: CanvasRenderingContext2D,
   id: ZombieId,
   x: number,
@@ -40,15 +40,15 @@ export function drawAnimal(
   const img = getImage(id);
 
   if (img && img.complete) {
-    ctx.drawImage(img, x, y, ANIMAL_SIZE, ANIMAL_SIZE);
+    ctx.drawImage(img, x, y, ZOMBIE_SIZE, ZOMBIE_SIZE);
   } else {
     // Fallback circle if image not loaded
     ctx.fillStyle = Zombies[id].color;
     ctx.beginPath();
     ctx.arc(
-      x + ANIMAL_SIZE / 2,
-      y + ANIMAL_SIZE / 2,
-      ANIMAL_SIZE / 2,
+      x + ZOMBIE_SIZE / 2,
+      y + ZOMBIE_SIZE / 2,
+      ZOMBIE_SIZE / 2,
       0,
       Math.PI * 2
     );
