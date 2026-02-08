@@ -1,3 +1,10 @@
+## [1.0.2](https://github.com/zen-zombie-zoo/zzz-web/compare/v1.0.1...v1.0.2) (2026-02-08)
+
+
+### Bug Fixes
+
+* rename variables ([9692b5d](https://github.com/zen-zombie-zoo/zzz-web/commit/9692b5d8919ec24c1bc49c187f44deedb3f4285f))
+
 ## [1.0.1](https://github.com/zen-zombie-zoo/zzz-web/compare/v1.0.0...v1.0.1) (2026-02-08)
 
 
