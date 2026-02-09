@@ -10,56 +10,70 @@ const mockGameContext: GameCtxType = {
   nextCost: vi.fn(() => 10),
   collectBrain: vi.fn(),
   spawnVisitor: vi.fn(),
-  upgradeMachine: vi.fn()
+  upgradeMachine: vi.fn(),
+  dismissAchievement: vi.fn()
 };
 
 describe("Header", () => {
   it("renders with help and settings buttons", () => {
     const onHelpClick = vi.fn();
     const onSettingsClick = vi.fn();
+    const onAchievementsClick = vi.fn();
 
     render(
       <GameCtx.Provider value={mockGameContext}>
-        <Header onHelpClick={onHelpClick} onSettingsClick={onSettingsClick} />
+        <Header
+          onHelpClick={onHelpClick}
+          onSettingsClick={onSettingsClick}
+          onAchievementsClick={onAchievementsClick}
+        />
       </GameCtx.Provider>
     );
 
     // Check for buttons - the exact text depends on the implementation
     const buttons = screen.getAllByRole("button");
-    expect(buttons.length).toBeGreaterThanOrEqual(2);
+    expect(buttons.length).toBeGreaterThanOrEqual(3);
   });
 
   it("calls onHelpClick when help button is clicked", async () => {
     const onHelpClick = vi.fn();
     const onSettingsClick = vi.fn();
+    const onAchievementsClick = vi.fn();
     const user = userEvent.setup();
 
     render(
       <GameCtx.Provider value={mockGameContext}>
-        <Header onHelpClick={onHelpClick} onSettingsClick={onSettingsClick} />
+        <Header
+          onHelpClick={onHelpClick}
+          onSettingsClick={onSettingsClick}
+          onAchievementsClick={onAchievementsClick}
+        />
       </GameCtx.Provider>
     );
 
-    const buttons = screen.getAllByRole("button");
-    // Find help button (typically first or has specific label)
-    await user.click(buttons[0]);
+    const helpButton = screen.getByTitle("Help");
+    await user.click(helpButton);
     expect(onHelpClick).toHaveBeenCalled();
   });
 
   it("calls onSettingsClick when settings button is clicked", async () => {
     const onHelpClick = vi.fn();
     const onSettingsClick = vi.fn();
+    const onAchievementsClick = vi.fn();
     const user = userEvent.setup();
 
     render(
       <GameCtx.Provider value={mockGameContext}>
-        <Header onHelpClick={onHelpClick} onSettingsClick={onSettingsClick} />
+        <Header
+          onHelpClick={onHelpClick}
+          onSettingsClick={onSettingsClick}
+          onAchievementsClick={onAchievementsClick}
+        />
       </GameCtx.Provider>
     );
 
-    const buttons = screen.getAllByRole("button");
-    // Settings button is typically the last or has specific label
-    await user.click(buttons[buttons.length - 1]);
+    const settingsButton = screen.getByTitle("Settings");
+    await user.click(settingsButton);
     expect(onSettingsClick).toHaveBeenCalled();
   });
 });

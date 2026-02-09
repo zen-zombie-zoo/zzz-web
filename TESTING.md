@@ -25,7 +25,7 @@ npm run test:coverage
 - ✅ Exponential cost growth
 - ✅ Production from zombies with multipliers
 - ✅ Visitor contribution to DPS
-- ✅ Gold accumulation over time
+- ✅ Brains accumulation over time
 
 ### Save/Load
 - ✅ Persistence to localStorage

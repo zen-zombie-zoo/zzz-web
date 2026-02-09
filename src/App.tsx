@@ -6,13 +6,18 @@ import { Tips } from "./ui/Tips";
 import { MachineModal } from "./ui/MachineModal";
 import { SettingsModal } from "./ui/SettingsModal";
 import { EarlyAccessModal } from "./ui/EarlyAccessModal";
+import { AchievementUnlockModal } from "./ui/AchievementUnlockModal";
+import { AchievementsListModal } from "./ui/AchievementsListModal";
+import { useGame } from "./game/useGame";
 
 const EARLY_ACCESS_KEY = "zzz_early_access_seen";
 
 const App: React.FC = () => {
+  const { state, dismissAchievement } = useGame();
   const [tipsOpen, setTipsOpen] = useState(false);
   const [machineOpen, setMachineOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [achievementsOpen, setAchievementsOpen] = useState(false);
   const [earlyAccessOpen, setEarlyAccessOpen] = useState(
     () => !localStorage.getItem(EARLY_ACCESS_KEY)
   );
@@ -27,6 +32,7 @@ const App: React.FC = () => {
       <Header
         onHelpClick={() => setTipsOpen(true)}
         onSettingsClick={() => setSettingsOpen(true)}
+        onAchievementsClick={() => setAchievementsOpen(true)}
       />
 
       <main className="main-content">
@@ -52,6 +58,23 @@ const App: React.FC = () => {
       <Modal open={earlyAccessOpen} onClose={handleEarlyAccessClose} title="Early Access">
         <EarlyAccessModal onClose={handleEarlyAccessClose} />
       </Modal>
+
+      {/* Achievements List Modal */}
+      <Modal
+        open={achievementsOpen}
+        onClose={() => setAchievementsOpen(false)}
+        title="Achievements"
+      >
+        <AchievementsListModal unlockedIds={state.achievements.unlockedIds} />
+      </Modal>
+
+      {/* Achievement Unlock Modal */}
+      {state.achievements.pendingUnlock && (
+        <AchievementUnlockModal
+          achievementId={state.achievements.pendingUnlock}
+          onDismiss={dismissAchievement}
+        />
+      )}
     </div>
   );
 };

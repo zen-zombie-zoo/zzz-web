@@ -6,6 +6,7 @@ import { theme } from "../theme";
 type Props = {
   onHelpClick: () => void;
   onSettingsClick: () => void;
+  onAchievementsClick: () => void;
 };
 
 const HeaderContainer = styled.header`
@@ -133,7 +134,11 @@ const HeaderButton = styled.button`
   }
 `;
 
-export const Header: React.FC<Props> = ({ onHelpClick, onSettingsClick }) => {
+export const Header: React.FC<Props> = ({
+  onHelpClick,
+  onSettingsClick,
+  onAchievementsClick
+}) => {
   const { state } = useGame();
 
   return (
@@ -150,9 +155,9 @@ export const Header: React.FC<Props> = ({ onHelpClick, onSettingsClick }) => {
           <Stat>
             <StatIcon>🧠</StatIcon>
             <StatValue variant="brains">
-              {Math.floor(state.gold).toLocaleString()}
+              {Math.floor(state.brains).toLocaleString()}
             </StatValue>
-            <StatRate>+{state.goldPerSecond.toFixed(1)}/s</StatRate>
+            <StatRate>+{state.brainsPerSecond.toFixed(1)}/s</StatRate>
           </Stat>
           <StatDivider />
           <Stat>
@@ -176,6 +181,9 @@ export const Header: React.FC<Props> = ({ onHelpClick, onSettingsClick }) => {
       </HeaderCenter>
 
       <HeaderRight>
+        <HeaderButton onClick={onAchievementsClick} title="Achievements">
+          <span>🏆</span>
+        </HeaderButton>
         <HeaderButton onClick={onHelpClick} title="Help">
           <span>?</span>
         </HeaderButton>

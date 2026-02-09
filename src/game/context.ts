@@ -7,9 +7,10 @@ export type GameCtxType = {
   state: GameState;
   buyZombie: (id: ZombieId, qty?: number) => void;
   nextCost: (id: ZombieId) => ReturnType<typeof nextUnitCost>;
-  collectBrain: () => void;
+  collectBrain: (amount?: number) => void;
   spawnVisitor: () => void;
   upgradeMachine: () => void;
+  dismissAchievement: () => void;
 };
 
 export const GameCtx = createContext<GameCtxType | null>(null);

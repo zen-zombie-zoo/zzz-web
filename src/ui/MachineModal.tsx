@@ -171,7 +171,7 @@ export const MachineModal: React.FC = () => {
     <div>
       <Resources>
         <div>
-          <strong>Brains:</strong> {Math.floor(state.gold).toLocaleString()}
+          <strong>Brains:</strong> {Math.floor(state.brains).toLocaleString()}
         </div>
         <div>
           <strong>Coins:</strong> ${state.money.toLocaleString()}
@@ -201,13 +201,13 @@ export const MachineModal: React.FC = () => {
                     <ZombieButtons>
                       <BuyButton
                         onClick={() => buyZombie(id, 1)}
-                        disabled={state.gold < cost1}
+                        disabled={state.brains < cost1}
                       >
                         +1 ({Math.floor(cost1).toLocaleString()})
                       </BuyButton>
                       <BuyButton
                         onClick={() => buyZombie(id, 10)}
-                        disabled={state.gold < cost10}
+                        disabled={state.brains < cost10}
                       >
                         +10
                       </BuyButton>

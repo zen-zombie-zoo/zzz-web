@@ -77,12 +77,7 @@ export const ZooCanvas: React.FC<Props> = ({ onMachineClick }) => {
   const floatingTextsRef = useRef<FloatingText[]>([]);
   const lastTimeRef = useRef<number>(0);
   const sizeRef = useRef({ W: 0, H: 0 });
-  const clickPowerRef = useRef(state.clickPower);
   const lastMoneyRef = useRef(state.money);
-
-  useEffect(() => {
-    clickPowerRef.current = state.clickPower;
-  }, [state.clickPower]);
 
   useEffect(() => {
     machineLevelRef.current = state.machineLevel;
@@ -149,12 +144,13 @@ export const ZooCanvas: React.FC<Props> = ({ onMachineClick }) => {
 
     if (clickedVisitorIndex !== -1) {
       const visitor = visitors[clickedVisitorIndex];
-      collectBrain();
+      const amount = Math.floor(Math.random() * 6); // Random number of brains from 0 to 5
+      collectBrain(amount);
 
       floatingTextsRef.current.push({
         x: visitor.x + VISITOR_SIZE / 2,
         y: visitor.y,
-        text: `+${clickPowerRef.current}`,
+        text: amount > 0 ? `+${amount}` : "0",
         life: 1,
       });
 

@@ -8,7 +8,7 @@ describe("Save & Load", () => {
 
   describe("save and load", () => {
     it("saves and loads game state", () => {
-      const state = { ...initialState(), gold: 500 };
+      const state = { ...initialState(), brains: 500 };
       save(state);
       const loaded = load();
       expect(loaded).toEqual(state);
@@ -20,10 +20,10 @@ describe("Save & Load", () => {
     });
 
     it("overwrites previous save", () => {
-      save({ ...initialState(), gold: 100 });
-      save({ ...initialState(), gold: 200 });
+      save({ ...initialState(), brains: 100 });
+      save({ ...initialState(), brains: 200 });
       const loaded = load();
-      expect(loaded?.gold).toBe(200);
+      expect(loaded?.brains).toBe(200);
     });
   });
 

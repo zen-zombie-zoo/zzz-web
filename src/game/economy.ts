@@ -3,14 +3,20 @@ import type { GameState } from "./types";
 
 // Constants
 const BASE_ENTRY_FEE = 5;
-const BRAINS_PER_VISITOR_PER_SEC = 0.5;
-const AVG_VISITOR_LIFETIME = 22.5;
 
 const VISITOR_ATTRACTION: Record<ZombieId, number> = {
   monkey: 0.01,
   giraffe: 0.02,
   penguin: 0.03,
-  elephant: 0.04
+  elephant: 0.04,
+  crocodile: 0.05,
+  gorilla: 0.06,
+  moose: 0.07,
+  rhino: 0.08,
+  narwhal: 0.09,
+  walrus: 0.1,
+  zebra: 0.11,
+  whale: 0.12
 };
 
 // Cost calculations
@@ -61,15 +67,13 @@ export function recalcDps(s: GameState): GameState {
   total *= s.multipliers.global;
 
   const visitorRate = recalcVisitorRate(s);
-  const estimatedActiveVisitors = visitorRate * AVG_VISITOR_LIFETIME;
-  total += estimatedActiveVisitors * BRAINS_PER_VISITOR_PER_SEC;
 
-  return { ...s, goldPerSecond: total, visitorRate };
+  return { ...s, brainsPerSecond: total, visitorRate };
 }
 
 export function applyTick(s: GameState, seconds: number): GameState {
   return {
     ...s,
-    gold: Math.round(s.gold + s.goldPerSecond * seconds)
+    brains: s.brains + s.brainsPerSecond * seconds
   };
 }

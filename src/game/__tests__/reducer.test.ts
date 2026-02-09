@@ -7,44 +7,58 @@ describe("Game Reducer", () => {
     it("buys a zombie and deducts cost", () => {
       const state = initialState();
       const result = gameReducer(state, { type: "BUY_ANIMAL", id: "monkey", qty: 1 });
-      
+
       expect(result.generators.monkey.owned).toBe(1);
-      expect(result.gold).toBe(100 - 10); // Cost of first monkey is 10
+      expect(result.brains).toBe(100 - 25); // Cost of first monkey is 25
     });
 
-    it("does not allow purchase if insufficient gold", () => {
-      const state = { ...initialState(), gold: 5 };
+    it("does not allow purchase if insufficient brains", () => {
+      const state = { ...initialState(), brains: 5 };
       const result = gameReducer(state, { type: "BUY_ANIMAL", id: "monkey", qty: 1 });
-      
+
       expect(result).toEqual(state); // State unchanged
       expect(result.generators.monkey.owned).toBe(0);
     });
 
     it("buys multiple zombies at once", () => {
       const state = initialState();
-      const result = gameReducer(state, { type: "BUY_ANIMAL", id: "monkey", qty: 3 });
-      
-      expect(result.generators.monkey.owned).toBe(3);
-      // Cost: 10 + 12.5 + 15.625
-      expect(result.gold).toBeLessThan(100);
+      const result = gameReducer(state, { type: "BUY_ANIMAL", id: "monkey", qty: 2 });
+
+      expect(result.generators.monkey.owned).toBe(2);
+      // Cost: 25 + 35 = 60
+      expect(result.brains).toBe(40);
     });
 
-    it("recalculates goldPerSecond after purchase", () => {
+    it("recalculates brainsPerSecond after purchase", () => {
       const state = initialState();
-      const result = gameReducer(state, { type: "BUY_ANIMAL", id: "monkey", qty: 5 });
-      
-      expect(result.goldPerSecond).toBeGreaterThan(0);
-      // 5 monkeys * 1 baseProd * 0.25 perAnimal * 1 global = 1.25, plus visitor brains
-      expect(result.goldPerSecond).toBeGreaterThanOrEqual(1.25);
+      const result = gameReducer(state, { type: "BUY_ANIMAL", id: "monkey", qty: 2 });
+
+      expect(result.brainsPerSecond).toBeGreaterThan(0);
+      // 2 monkeys * 0.5 baseProd * 0.25 perAnimal * 1 global = 0.25
+      expect(result.brainsPerSecond).toBeCloseTo(0.25, 4);
     });
   });
 
   describe("CLICK action", () => {
-    it("adds clickPower to gold", () => {
+    it("adds clickPower to brains when no amount specified", () => {
       const state = initialState();
       const result = gameReducer(state, { type: "CLICK" });
-      
-      expect(result.gold).toBe(100 + 1); // clickPower is 1
+
+      expect(result.brains).toBe(100 + 1); // clickPower is 1
+    });
+
+    it("adds specified amount to brains", () => {
+      const state = initialState();
+      const result = gameReducer(state, { type: "CLICK", amount: 3 });
+
+      expect(result.brains).toBe(100 + 3);
+    });
+
+    it("handles zero amount", () => {
+      const state = initialState();
+      const result = gameReducer(state, { type: "CLICK", amount: 0 });
+
+      expect(result.brains).toBe(100);
     });
 
     it("stacks multiple clicks", () => {
@@ -52,8 +66,8 @@ describe("Game Reducer", () => {
       state = gameReducer(state, { type: "CLICK" });
       state = gameReducer(state, { type: "CLICK" });
       state = gameReducer(state, { type: "CLICK" });
-      
-      expect(state.gold).toBe(100 + 3);
+
+      expect(state.brains).toBe(100 + 3);
     });
   });
 
@@ -75,27 +89,27 @@ describe("Game Reducer", () => {
   });
 
   describe("TICK action", () => {
-    it("increases gold based on goldPerSecond", () => {
-      const state = { ...initialState(), goldPerSecond: 10 };
+    it("increases brains based on brainsPerSecond", () => {
+      const state = { ...initialState(), brainsPerSecond: 10 };
       const result = gameReducer(state, { type: "TICK", seconds: 1 });
-      
-      expect(result.gold).toBe(100 + 10);
+
+      expect(result.brains).toBe(100 + 10);
     });
 
     it("handles multiple seconds", () => {
-      const state = { ...initialState(), goldPerSecond: 5 };
+      const state = { ...initialState(), brainsPerSecond: 5 };
       const result = gameReducer(state, { type: "TICK", seconds: 10 });
-      
-      expect(result.gold).toBe(100 + 50);
+
+      expect(result.brains).toBe(100 + 50);
     });
   });
 
   describe("LOAD action", () => {
     it("loads a saved state", () => {
-      const savedState: GameState = { ...initialState(), gold: 500, money: 250 };
+      const savedState: GameState = { ...initialState(), brains: 500, money: 250 };
       const result = gameReducer(initialState(), { type: "LOAD", state: savedState });
-      
-      expect(result.gold).toBe(500);
+
+      expect(result.brains).toBe(500);
       expect(result.money).toBe(250);
     });
 
@@ -105,8 +119,8 @@ describe("Game Reducer", () => {
         generators: { ...initialState().generators, monkey: { owned: 10 } }
       };
       const result = gameReducer(initialState(), { type: "LOAD", state: savedState });
-      
-      expect(result.goldPerSecond).toBeGreaterThan(0);
+
+      expect(result.brainsPerSecond).toBeGreaterThan(0);
     });
   });
 
@@ -138,28 +152,28 @@ describe("Game Reducer", () => {
   describe("Complex workflows", () => {
     it("can buy a zombie and then earn from it", () => {
       let state = { ...initialState() };
-      
-      // Buy 5 monkeys (cost: 10 + 12.5 + 15.625 + 19.53 + 24.41 = ~81.5)
-      state = gameReducer(state, { type: "BUY_ANIMAL", id: "monkey", qty: 5 });
-      expect(state.generators.monkey.owned).toBe(5);
-      expect(state.goldPerSecond).toBeGreaterThan(0);
-      
-      // Tick and earn
-      const initialGoldAfterBuy = state.gold;
-      state = gameReducer(state, { type: "TICK", seconds: 1 });
-      expect(state.gold).toBeGreaterThan(initialGoldAfterBuy);
+
+      // Buy 2 monkeys (cost: 25 + 35 = 60)
+      state = gameReducer(state, { type: "BUY_ANIMAL", id: "monkey", qty: 2 });
+      expect(state.generators.monkey.owned).toBe(2);
+      expect(state.brainsPerSecond).toBeGreaterThan(0);
+
+      // Tick and earn (need longer tick for lower production rate)
+      const initialBrainsAfterBuy = state.brains;
+      state = gameReducer(state, { type: "TICK", seconds: 10 });
+      expect(state.brains).toBeGreaterThan(initialBrainsAfterBuy);
     });
 
     it("allows buying more expensive zombies after earning", () => {
       let state = { ...initialState() };
-      
-      // Earn from clicks - need 150 gold for giraffe, start with 100
-      for (let i = 0; i < 60; i++) {
+
+      // Earn from clicks - need 400 brains for giraffe, start with 100
+      for (let i = 0; i < 310; i++) {
         state = gameReducer(state, { type: "CLICK" });
       }
-      expect(state.gold).toBe(100 + 60); // 160 total
-      
-      // Buy giraffe (costs 150)
+      expect(state.brains).toBe(100 + 310); // 410 total
+
+      // Buy giraffe (costs 400)
       state = gameReducer(state, { type: "BUY_ANIMAL", id: "giraffe", qty: 1 });
       expect(state.generators.giraffe.owned).toBe(1);
     });

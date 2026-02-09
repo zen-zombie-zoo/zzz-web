@@ -21,6 +21,7 @@ const List = styled.ul`
   line-height: ${theme.lineHeightRelaxed};
   color: ${theme.textMuted};
   font-size: ${theme.fontSizeSm};
+  list-style-type: none;
 
   li {
     margin-bottom: ${theme.spacingSm};
@@ -43,7 +44,7 @@ export const Tips: React.FC = () => {
       <Heading>Tips</Heading>
       <List>
         <li>
-          Buy zombies to increase your brain production, and attact more
+          Buy zombies to increase your brain production, and attract more
           visitors to your zoo
         </li>
         <li>Each zombie type produces different amounts of brains per second</li>
@@ -52,6 +53,7 @@ export const Tips: React.FC = () => {
         </li>
         <li>The game saves automatically every 5 seconds</li>
         <li>You earn offline progress when you return!</li>
+        <li>Hint: visitors also give brains ;)</li>
       </List>
     </div>
   );
