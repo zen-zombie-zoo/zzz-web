@@ -2,7 +2,7 @@ import { Zombies, type ZombieId } from "./zombies";
 import { applyTick, recalcDps, totalCostForQuantity, getEntryFee } from "./economy";
 import type { GameState } from "./types";
 import { getNextUpgrade } from "./machine";
-import { checkForNewAchievements, type PlayerStats } from "./achievements";
+import { checkForNewAchievements } from "./achievements";
 
 export type Action =
   | { type: "LOAD"; state: GameState }
@@ -12,13 +12,6 @@ export type Action =
   | { type: "SPAWN_VISITOR" }
   | { type: "UPGRADE_MACHINE" }
   | { type: "DISMISS_ACHIEVEMENT" };
-
-function updateStats(
-  stats: PlayerStats,
-  updates: Partial<PlayerStats>
-): PlayerStats {
-  return { ...stats, ...updates };
-}
 
 function withAchievementCheck(state: GameState): GameState {
   if (state.achievements.pendingUnlock) return state;
@@ -53,17 +46,17 @@ export function gameReducer(state: GameState, action: Action): GameState {
       const brainsEarned = tickedState.brains - state.brains;
       if (brainsEarned <= 0) return tickedState;
 
-      const newState: GameState = {
+      const { stats } = tickedState.achievements;
+      return withAchievementCheck({
         ...tickedState,
         achievements: {
           ...tickedState.achievements,
-          stats: updateStats(tickedState.achievements.stats, {
-            totalBrainsEarned:
-              tickedState.achievements.stats.totalBrainsEarned + brainsEarned
-          })
+          stats: {
+            ...stats,
+            totalBrainsEarned: stats.totalBrainsEarned + brainsEarned
+          }
         }
-      };
-      return withAchievementCheck(newState);
+      });
     }
 
     case "BUY_ANIMAL": {
@@ -72,53 +65,56 @@ export function gameReducer(state: GameState, action: Action): GameState {
       const cost = totalCostForQuantity(def, owned, action.qty);
       if (state.brains < cost) return state;
 
-      const s1: GameState = {
-        ...state,
-        brains: state.brains - cost,
-        generators: {
-          ...state.generators,
-          [action.id]: { owned: owned + action.qty }
-        },
-        achievements: {
-          ...state.achievements,
-          stats: updateStats(state.achievements.stats, {
-            totalZombiesBought:
-              state.achievements.stats.totalZombiesBought + action.qty
-          })
-        }
-      };
-      return withAchievementCheck(recalcDps(s1));
+      const { stats } = state.achievements;
+      return withAchievementCheck(
+        recalcDps({
+          ...state,
+          brains: state.brains - cost,
+          generators: {
+            ...state.generators,
+            [action.id]: { owned: owned + action.qty }
+          },
+          achievements: {
+            ...state.achievements,
+            stats: {
+              ...stats,
+              totalZombiesBought: stats.totalZombiesBought + action.qty
+            }
+          }
+        })
+      );
     }
 
     case "CLICK": {
       const clickAmount = action.amount ?? state.clickPower;
-      const newState: GameState = {
+      const { stats } = state.achievements;
+      return withAchievementCheck({
         ...state,
         brains: state.brains + clickAmount,
         achievements: {
           ...state.achievements,
-          stats: updateStats(state.achievements.stats, {
-            totalClicks: state.achievements.stats.totalClicks + 1,
-            totalBrainsEarned:
-              state.achievements.stats.totalBrainsEarned + clickAmount
-          })
+          stats: {
+            ...stats,
+            totalClicks: stats.totalClicks + 1,
+            totalBrainsEarned: stats.totalBrainsEarned + clickAmount
+          }
         }
-      };
-      return withAchievementCheck(newState);
+      });
     }
 
     case "SPAWN_VISITOR": {
-      const newState: GameState = {
+      const { stats } = state.achievements;
+      return withAchievementCheck({
         ...state,
         money: state.money + getEntryFee(),
         achievements: {
           ...state.achievements,
-          stats: updateStats(state.achievements.stats, {
-            totalVisitors: state.achievements.stats.totalVisitors + 1
-          })
+          stats: {
+            ...stats,
+            totalVisitors: stats.totalVisitors + 1
+          }
         }
-      };
-      return withAchievementCheck(newState);
+      });
     }
 
     case "UPGRADE_MACHINE": {
