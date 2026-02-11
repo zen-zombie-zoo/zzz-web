@@ -43,9 +43,7 @@ export function gameReducer(state: GameState, action: Action): GameState {
       // Clean expired boosts first
       const cleanedBoosts = cleanExpiredBoosts(state.activeBoosts ?? []);
       const boostsChanged = cleanedBoosts.length !== (state.activeBoosts?.length ?? 0);
-      const stateWithCleanBoosts = boostsChanged
-        ? recalcDps({ ...state, activeBoosts: cleanedBoosts })
-        : state;
+      const stateWithCleanBoosts = boostsChanged ? recalcDps({ ...state, activeBoosts: cleanedBoosts }) : state;
 
       const tickedState = applyTick(stateWithCleanBoosts, action.seconds);
       const { _tickResult, ...newState } = tickedState;
