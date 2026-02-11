@@ -1,11 +1,7 @@
 import React from "react";
 import styled from "@emotion/styled";
 import { theme } from "../theme";
-import {
-  ACHIEVEMENTS,
-  type AchievementCategory,
-  type AchievementDef
-} from "../game/achievements";
+import { ACHIEVEMENTS, type AchievementCategory, type AchievementDef } from "../game/achievements";
 
 type Props = {
   unlockedIds: string[];
@@ -17,11 +13,7 @@ const CATEGORY_LABELS: Record<AchievementCategory, string> = {
   activity: "Activity"
 };
 
-const CATEGORY_ORDER: AchievementCategory[] = [
-  "milestone",
-  "collection",
-  "activity"
-];
+const CATEGORY_ORDER: AchievementCategory[] = ["milestone", "collection", "activity"];
 
 const Container = styled.div`
   display: flex;
@@ -68,8 +60,7 @@ const Card = styled.div<{ locked: boolean }>`
   padding: ${theme.spacingLg};
   background: ${props => (props.locked ? theme.bgCard : theme.bgButton)};
   border-radius: ${theme.radiusMd};
-  border: 1px solid
-    ${props => (props.locked ? theme.borderSubtle : theme.colorAccentDim)};
+  border: 1px solid ${props => (props.locked ? theme.borderSubtle : theme.colorAccentDim)};
   opacity: ${props => (props.locked ? 0.5 : 1)};
   transition: all ${theme.transitionFast};
 `;
@@ -81,8 +72,7 @@ const CardIcon = styled.div<{ locked: boolean }>`
   align-items: center;
   justify-content: center;
   font-size: 24px;
-  background: ${props =>
-    props.locked ? theme.bgButtonHover : theme.colorAccentDim};
+  background: ${props => (props.locked ? theme.bgButtonHover : theme.colorAccentDim)};
   border-radius: ${theme.radiusSm};
   filter: ${props => (props.locked ? "grayscale(1)" : "none")};
 `;
@@ -104,25 +94,13 @@ const CardDescription = styled.div<{ locked: boolean }>`
   color: ${props => (props.locked ? theme.textMuted : theme.textSecondary)};
 `;
 
-function AchievementCard({
-  achievement,
-  unlocked
-}: {
-  achievement: AchievementDef;
-  unlocked: boolean;
-}) {
+function AchievementCard({ achievement, unlocked }: { achievement: AchievementDef; unlocked: boolean }) {
   return (
     <Card locked={!unlocked}>
-      <CardIcon locked={!unlocked}>
-        {unlocked ? achievement.icon : "?"}
-      </CardIcon>
+      <CardIcon locked={!unlocked}>{unlocked ? achievement.icon : "?"}</CardIcon>
       <CardContent>
-        <CardName locked={!unlocked}>
-          {unlocked ? achievement.name : "???"}
-        </CardName>
-        <CardDescription locked={!unlocked}>
-          {unlocked ? achievement.description : "???"}
-        </CardDescription>
+        <CardName locked={!unlocked}>{unlocked ? achievement.name : "???"}</CardName>
+        <CardDescription locked={!unlocked}>{unlocked ? achievement.description : "???"}</CardDescription>
       </CardContent>
     </Card>
   );
@@ -150,11 +128,7 @@ export const AchievementsListModal: React.FC<Props> = ({ unlockedIds }) => {
           <SectionTitle>{label}</SectionTitle>
           <Grid>
             {achievements.map(achievement => (
-              <AchievementCard
-                key={achievement.id}
-                achievement={achievement}
-                unlocked={unlockedSet.has(achievement.id)}
-              />
+              <AchievementCard key={achievement.id} achievement={achievement} unlocked={unlockedSet.has(achievement.id)} />
             ))}
           </Grid>
         </Section>

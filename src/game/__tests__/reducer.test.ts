@@ -1,40 +1,41 @@
 import { initialState } from "../state";
 import { gameReducer } from "../reducer";
 import type { GameState } from "../types";
+import { Zombies } from "../zombies";
 
 describe("Game Reducer", () => {
   describe("BUY_ANIMAL action", () => {
     it("buys a zombie and deducts cost", () => {
       const state = initialState();
-      const result = gameReducer(state, { type: "BUY_ANIMAL", id: "monkey", qty: 1 });
+      const result = gameReducer(state, { type: "BUY_ANIMAL", id: Zombies.officerWorker.id, qty: 1 });
 
-      expect(result.generators.monkey.owned).toBe(1);
-      expect(result.brains).toBe(100 - 25); // Cost of first monkey is 25
+      expect(result.generators[Zombies.officerWorker.id].owned).toBe(1);
+      expect(result.brains).toBe(100 - 25); // Cost of first office worker zombie is 25
     });
 
     it("does not allow purchase if insufficient brains", () => {
       const state = { ...initialState(), brains: 5 };
-      const result = gameReducer(state, { type: "BUY_ANIMAL", id: "monkey", qty: 1 });
+      const result = gameReducer(state, { type: "BUY_ANIMAL", id: Zombies.officerWorker.id, qty: 1 });
 
       expect(result).toEqual(state); // State unchanged
-      expect(result.generators.monkey.owned).toBe(0);
+      expect(result.generators[Zombies.officerWorker.id].owned).toBe(0);
     });
 
     it("buys multiple zombies at once", () => {
       const state = initialState();
-      const result = gameReducer(state, { type: "BUY_ANIMAL", id: "monkey", qty: 2 });
+      const result = gameReducer(state, { type: "BUY_ANIMAL", id: Zombies.officerWorker.id, qty: 2 });
 
-      expect(result.generators.monkey.owned).toBe(2);
+      expect(result.generators[Zombies.officerWorker.id].owned).toBe(2);
       // Cost: 25 + 35 = 60
       expect(result.brains).toBe(40);
     });
 
     it("recalculates brainsPerSecond after purchase", () => {
       const state = initialState();
-      const result = gameReducer(state, { type: "BUY_ANIMAL", id: "monkey", qty: 2 });
+      const result = gameReducer(state, { type: "BUY_ANIMAL", id: Zombies.officerWorker.id, qty: 2 });
 
       expect(result.brainsPerSecond).toBeGreaterThan(0);
-      // 2 monkeys * 0.5 baseProd * 0.25 perAnimal * 1 global = 0.25
+      // 2 office worker zombies * 0.5 baseProd * 0.25 perAnimal * 1 global = 0.25
       expect(result.brainsPerSecond).toBeCloseTo(0.25, 4);
     });
   });
@@ -75,16 +76,18 @@ describe("Game Reducer", () => {
     it("adds entry fee to money", () => {
       const state = initialState();
       const result = gameReducer(state, { type: "SPAWN_VISITOR" });
-      
+
       expect(result.money).toBe(5); // Entry fee is 5
     });
 
-    it("stacks multiple visitors", () => {
+    it("stacks multiple visitors with reputation bonus", () => {
       let state = initialState();
       state = gameReducer(state, { type: "SPAWN_VISITOR" });
+      // After first visitor: reputation = 0.1, money = 5
       state = gameReducer(state, { type: "SPAWN_VISITOR" });
-      
-      expect(state.money).toBe(10);
+      // Second visitor pays 5 * (1 + 0.1 * 0.005) = 5.0025
+      expect(state.money).toBeCloseTo(10.0025, 4);
+      expect(state.reputation).toBeCloseTo(0.2, 4);
     });
   });
 
@@ -116,7 +119,7 @@ describe("Game Reducer", () => {
     it("recalculates DPS after loading", () => {
       const savedState: GameState = {
         ...initialState(),
-        generators: { ...initialState().generators, monkey: { owned: 10 } }
+        generators: { ...initialState().generators, [Zombies.officerWorker.id]: { owned: 10 } }
       };
       const result = gameReducer(initialState(), { type: "LOAD", state: savedState });
 
@@ -128,7 +131,7 @@ describe("Game Reducer", () => {
     it("upgrades machine when enough money", () => {
       const state = { ...initialState(), money: 1000, machineLevel: 0 };
       const result = gameReducer(state, { type: "UPGRADE_MACHINE" });
-      
+
       expect(result.machineLevel).toBeGreaterThan(0);
       expect(result.money).toBeLessThan(1000);
     });
@@ -136,14 +139,14 @@ describe("Game Reducer", () => {
     it("does not upgrade when insufficient money", () => {
       const state = { ...initialState(), money: 5, machineLevel: 0 };
       const result = gameReducer(state, { type: "UPGRADE_MACHINE" });
-      
+
       expect(result).toEqual(state);
     });
 
     it("does not upgrade when at max level", () => {
       const state = { ...initialState(), money: 10000, machineLevel: 100 };
       const result = gameReducer(state, { type: "UPGRADE_MACHINE" });
-      
+
       // Should be unchanged if no more upgrades available
       expect(result.machineLevel).toBe(100);
     });
@@ -153,9 +156,9 @@ describe("Game Reducer", () => {
     it("can buy a zombie and then earn from it", () => {
       let state = { ...initialState() };
 
-      // Buy 2 monkeys (cost: 25 + 35 = 60)
-      state = gameReducer(state, { type: "BUY_ANIMAL", id: "monkey", qty: 2 });
-      expect(state.generators.monkey.owned).toBe(2);
+      // Buy 2 office worker zombies (cost: 25 + 35 = 60)
+      state = gameReducer(state, { type: "BUY_ANIMAL", id: Zombies.officerWorker.id, qty: 2 });
+      expect(state.generators[Zombies.officerWorker.id].owned).toBe(2);
       expect(state.brainsPerSecond).toBeGreaterThan(0);
 
       // Tick and earn (need longer tick for lower production rate)
@@ -167,15 +170,15 @@ describe("Game Reducer", () => {
     it("allows buying more expensive zombies after earning", () => {
       let state = { ...initialState() };
 
-      // Earn from clicks - need 400 brains for giraffe, start with 100
+      // Earn from clicks - need 400 brains for teacher zombie, start with 100
       for (let i = 0; i < 310; i++) {
         state = gameReducer(state, { type: "CLICK" });
       }
       expect(state.brains).toBe(100 + 310); // 410 total
 
-      // Buy giraffe (costs 400)
-      state = gameReducer(state, { type: "BUY_ANIMAL", id: "giraffe", qty: 1 });
-      expect(state.generators.giraffe.owned).toBe(1);
+      // Buy teacher zombie (costs 400)
+      state = gameReducer(state, { type: "BUY_ANIMAL", id: Zombies.teacher.id, qty: 1 });
+      expect(state.generators[Zombies.teacher.id].owned).toBe(1);
     });
   });
 });

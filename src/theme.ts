@@ -50,8 +50,7 @@ export const theme = {
   shadowGlowSuccess: "0 0 20px rgba(34, 201, 146, 0.3)",
 
   // Typography
-  fontFamily:
-    '"Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu, Cantarell, "Noto Sans", Arial, sans-serif',
+  fontFamily: '"Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu, Cantarell, "Noto Sans", Arial, sans-serif',
   fontSizeXs: "11px",
   fontSizeSm: "13px",
   fontSizeBase: "14px",
@@ -85,7 +84,7 @@ export const theme = {
   // Transitions
   transitionFast: "150ms ease",
   transitionNormal: "200ms ease",
-  transitionSlow: "300ms ease",
+  transitionSlow: "300ms ease"
 } as const;
 
 export type Theme = typeof theme;

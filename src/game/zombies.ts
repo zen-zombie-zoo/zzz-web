@@ -1,5 +1,5 @@
-import monkeyImg from "../assets/kenney_animal-pack-redux/PNG/Round without details/monkey.png";
-import giraffeImg from "../assets/kenney_animal-pack-redux/PNG/Round without details/giraffe.png";
+import officeWorkerImg from "../assets/zombies/office-zombie.svg";
+import teacherImg from "../assets/zombies/teacher-zombie.svg";
 import penguinImg from "../assets/kenney_animal-pack-redux/PNG/Round without details/penguin.png";
 import elephantImg from "../assets/kenney_animal-pack-redux/PNG/Round without details/elephant.png";
 import crocodileImg from "../assets/kenney_animal-pack-redux/PNG/Round without details/crocodile.png";
@@ -12,21 +12,21 @@ import zebraImg from "../assets/kenney_animal-pack-redux/PNG/Round without detai
 import whaleImg from "../assets/kenney_animal-pack-redux/PNG/Round without details/whale.png";
 
 export const Zombies = {
-  monkey: {
-    id: "monkey",
-    name: "Monkey",
+  officerWorker: {
+    id: "officerWorker",
+    name: "Office Worker",
     color: "#f59e0b",
-    image: monkeyImg,
+    image: officeWorkerImg,
     baseCost: 25,
     costGrowth: 1.4,
     baseProd: 0.5,
     unlockAt: 0
   },
-  giraffe: {
-    id: "giraffe",
-    name: "Giraffe",
+  teacher: {
+    id: "teacher",
+    name: "Teacher",
     color: "#a78bfa",
-    image: giraffeImg,
+    image: teacherImg,
     baseCost: 400,
     costGrowth: 1.6,
     baseProd: 5,

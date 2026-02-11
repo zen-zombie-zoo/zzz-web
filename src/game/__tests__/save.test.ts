@@ -52,10 +52,10 @@ describe("Save & Load", () => {
     it("clamps offline progress to 8 hours", () => {
       const twoHoursAgo = Date.now() - 2 * 3600 * 1000;
       const twentyHoursAgo = Date.now() - 20 * 3600 * 1000;
-      
+
       const recentOffline = computeOfflineSeconds(twoHoursAgo);
       expect(recentOffline).toBe(2 * 3600);
-      
+
       const oldOffline = computeOfflineSeconds(twentyHoursAgo);
       expect(oldOffline).toBe(8 * 3600); // Clamped to 8 hours
     });

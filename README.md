@@ -72,7 +72,7 @@ npm run test:coverage
 ### Progression & Retention
 
 - [ ] Prestige/Rebirth - Reset for permanent multipliers
-- [ ] Achievements - Unlock badges for milestones
+- [x] Achievements - Unlock badges for milestones
 - [ ] Milestones - Automatic bonuses at certain thresholds
 
 ### Polish & UX

@@ -18,9 +18,7 @@ const App: React.FC = () => {
   const [machineOpen, setMachineOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [achievementsOpen, setAchievementsOpen] = useState(false);
-  const [earlyAccessOpen, setEarlyAccessOpen] = useState(
-    () => !localStorage.getItem(EARLY_ACCESS_KEY)
-  );
+  const [earlyAccessOpen, setEarlyAccessOpen] = useState(() => !localStorage.getItem(EARLY_ACCESS_KEY));
 
   const handleEarlyAccessClose = () => {
     localStorage.setItem(EARLY_ACCESS_KEY, "true");
@@ -29,11 +27,7 @@ const App: React.FC = () => {
 
   return (
     <div className="app">
-      <Header
-        onHelpClick={() => setTipsOpen(true)}
-        onSettingsClick={() => setSettingsOpen(true)}
-        onAchievementsClick={() => setAchievementsOpen(true)}
-      />
+      <Header onHelpClick={() => setTipsOpen(true)} onSettingsClick={() => setSettingsOpen(true)} onAchievementsClick={() => setAchievementsOpen(true)} />
 
       <main className="main-content">
         <ZooCanvas onMachineClick={() => setMachineOpen(true)} />
@@ -60,21 +54,12 @@ const App: React.FC = () => {
       </Modal>
 
       {/* Achievements List Modal */}
-      <Modal
-        open={achievementsOpen}
-        onClose={() => setAchievementsOpen(false)}
-        title="Achievements"
-      >
+      <Modal open={achievementsOpen} onClose={() => setAchievementsOpen(false)} title="Achievements">
         <AchievementsListModal unlockedIds={state.achievements.unlockedIds} />
       </Modal>
 
       {/* Achievement Unlock Modal */}
-      {state.achievements.pendingUnlock && (
-        <AchievementUnlockModal
-          achievementId={state.achievements.pendingUnlock}
-          onDismiss={dismissAchievement}
-        />
-      )}
+      {state.achievements.pendingUnlock && <AchievementUnlockModal achievementId={state.achievements.pendingUnlock} onDismiss={dismissAchievement} />}
     </div>
   );
 };

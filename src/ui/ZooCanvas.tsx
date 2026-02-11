@@ -3,24 +3,20 @@ import styled from "@emotion/styled";
 import { Zombies, type ZombieId } from "../game/zombies";
 import { useGame } from "../game/useGame";
 import { theme } from "../theme"; // Used for styled components
-import {
-  type Entity,
-  ZOMBIE_SPEED,
-  VISITOR_SPEED,
-  createCardinalVelocity,
-  updateZombieMovement,
-  updateVisitorMovement,
-} from "../game/movement";
+import { type Entity, ZOMBIE_SPEED, VISITOR_SPEED, createCardinalVelocity, updateZombieMovement, updateVisitorMovement, updateVisitorLeaving } from "../game/movement";
 import {
   ZOMBIE_SIZE,
   VISITOR_SIZE,
   MACHINE_SIZE,
   MACHINE_PADDING,
+  GATE_WIDTH,
+  GATE_HEIGHT,
   drawZombie,
   drawVisitor,
   drawFloatingText,
   drawMachine,
-  clearCanvas,
+  drawGate,
+  clearCanvas
 } from "../game/renderer";
 
 type Props = {
@@ -33,6 +29,7 @@ type ZombieInstance = Entity & {
 
 type VisitorInstance = Entity & {
   lifetime: number;
+  leaving: boolean;
 };
 
 type FloatingText = {
@@ -59,11 +56,15 @@ const Canvas = styled.canvas`
   background: ${theme.bg};
   border-radius: ${theme.radiusXl};
   cursor: pointer;
-  box-shadow: ${theme.shadowLg}, inset 0 0 0 1px ${theme.borderSubtle};
+  box-shadow:
+    ${theme.shadowLg},
+    inset 0 0 0 1px ${theme.borderSubtle};
   transition: box-shadow ${theme.transitionNormal};
 
   &:hover {
-    box-shadow: ${theme.shadowLg}, inset 0 0 0 1px ${theme.borderDefault};
+    box-shadow:
+      ${theme.shadowLg},
+      inset 0 0 0 1px ${theme.borderDefault};
   }
 `;
 
@@ -84,23 +85,27 @@ export const ZooCanvas: React.FC<Props> = ({ onMachineClick }) => {
   }, [state.machineLevel]);
 
   useEffect(() => {
-    const { W, H } = sizeRef.current;
+    const { W } = sizeRef.current;
     const moneyDiff = state.money - lastMoneyRef.current;
     lastMoneyRef.current = state.money;
 
     if (moneyDiff > 0) {
       const visitorsToSpawn = Math.floor(moneyDiff / 5);
+      // Gate position at center top
+      const gateX = (W - GATE_WIDTH) / 2;
+      const spawnX = gateX + GATE_WIDTH / 2 - VISITOR_SIZE / 2;
+      const spawnY = GATE_HEIGHT;
+
       for (let i = 0; i < visitorsToSpawn; i++) {
         const angle = Math.random() * Math.PI * 2;
-        const lifetime =
-          VISITOR_MIN_LIFETIME +
-          Math.random() * (VISITOR_MAX_LIFETIME - VISITOR_MIN_LIFETIME);
+        const lifetime = VISITOR_MIN_LIFETIME + Math.random() * (VISITOR_MAX_LIFETIME - VISITOR_MIN_LIFETIME);
         visitorsRef.current.push({
-          x: VISITOR_SIZE + Math.random() * Math.max(1, W - VISITOR_SIZE * 2),
-          y: VISITOR_SIZE + Math.random() * Math.max(1, H - VISITOR_SIZE * 2),
+          x: spawnX,
+          y: spawnY,
           vx: Math.cos(angle) * VISITOR_SPEED,
           vy: Math.sin(angle) * VISITOR_SPEED,
           lifetime,
+          leaving: false
         });
       }
     }
@@ -117,12 +122,7 @@ export const ZooCanvas: React.FC<Props> = ({ onMachineClick }) => {
 
     const machineX = W - MACHINE_SIZE - MACHINE_PADDING;
     const machineY = H - MACHINE_SIZE - MACHINE_PADDING;
-    if (
-      x >= machineX &&
-      x <= machineX + MACHINE_SIZE &&
-      y >= machineY &&
-      y <= machineY + MACHINE_SIZE
-    ) {
+    if (x >= machineX && x <= machineX + MACHINE_SIZE && y >= machineY && y <= machineY + MACHINE_SIZE) {
       onMachineClick?.();
       return;
     }
@@ -151,7 +151,7 @@ export const ZooCanvas: React.FC<Props> = ({ onMachineClick }) => {
         x: visitor.x + VISITOR_SIZE / 2,
         y: visitor.y,
         text: amount > 0 ? `+${amount}` : "0",
-        life: 1,
+        life: 1
       });
 
       visitorsRef.current.splice(clickedVisitorIndex, 1);
@@ -178,7 +178,7 @@ export const ZooCanvas: React.FC<Props> = ({ onMachineClick }) => {
             id,
             x: ZOMBIE_SIZE + Math.random() * Math.max(1, W - ZOMBIE_SIZE * 2),
             y: ZOMBIE_SIZE + Math.random() * Math.max(1, H - ZOMBIE_SIZE * 2),
-            ...velocity,
+            ...velocity
           });
         }
       }
@@ -194,11 +194,20 @@ export const ZooCanvas: React.FC<Props> = ({ onMachineClick }) => {
 
     function resize() {
       const rect = canvas.getBoundingClientRect();
+      const wasUninitialized = sizeRef.current.W === 0;
       sizeRef.current.W = rect.width;
       sizeRef.current.H = rect.height;
       canvas.width = Math.max(1, Math.floor(rect.width * dpr));
       canvas.height = Math.max(1, Math.floor(rect.height * dpr));
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      // Randomize zombie positions on initial load
+      if (wasUninitialized && rect.width > 0 && rect.height > 0) {
+        for (const zombie of zombiesRef.current) {
+          zombie.x = ZOMBIE_SIZE + Math.random() * (rect.width - ZOMBIE_SIZE * 2);
+          zombie.y = ZOMBIE_SIZE + Math.random() * (rect.height - ZOMBIE_SIZE * 2);
+        }
+      }
     }
 
     const observer = new ResizeObserver(resize);
@@ -208,17 +217,41 @@ export const ZooCanvas: React.FC<Props> = ({ onMachineClick }) => {
       const { W, H } = sizeRef.current;
       const zombies = zombiesRef.current;
       const visitors = visitorsRef.current;
-      const bounds = { width: W, height: H, padding: 10, topPadding: 30 };
+      const bounds = { width: W, height: H, padding: 10, topPadding: GATE_HEIGHT + 10 };
+
+      // Gate position for leaving visitors
+      const gateX = (W - GATE_WIDTH) / 2 + GATE_WIDTH / 2 - VISITOR_SIZE / 2;
+      const gateY = GATE_HEIGHT / 2;
 
       for (const zombie of zombies) {
         updateZombieMovement(zombie, bounds, ZOMBIE_SIZE, dt);
       }
 
       for (const visitor of visitors) {
-        updateVisitorMovement(visitor, bounds, VISITOR_SIZE, dt);
         visitor.lifetime -= dt;
+
+        // Switch to leaving mode when lifetime is low
+        if (visitor.lifetime < 3 && !visitor.leaving) {
+          visitor.leaving = true;
+        }
+
+        if (visitor.leaving) {
+          updateVisitorLeaving(visitor, gateX, gateY, dt);
+        } else {
+          updateVisitorMovement(visitor, bounds, VISITOR_SIZE, dt);
+        }
       }
-      visitorsRef.current = visitors.filter(v => v.lifetime > 0);
+
+      // Remove visitors that reached the gate (within 15px) or lifetime expired
+      visitorsRef.current = visitors.filter(v => {
+        if (v.leaving) {
+          const dx = gateX - v.x;
+          const dy = gateY - v.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          return dist > 15;
+        }
+        return v.lifetime > 0;
+      });
 
       const texts = floatingTextsRef.current;
       for (const text of texts) {
@@ -231,6 +264,10 @@ export const ZooCanvas: React.FC<Props> = ({ onMachineClick }) => {
     function draw() {
       const { W, H } = sizeRef.current;
       clearCanvas(ctx, W, H);
+
+      // Draw gate at center top
+      const gateX = (W - GATE_WIDTH) / 2;
+      drawGate(ctx, gateX, 0);
 
       for (const zombie of zombiesRef.current) {
         drawZombie(ctx, zombie.id, zombie.x, zombie.y);

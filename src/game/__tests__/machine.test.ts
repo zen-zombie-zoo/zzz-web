@@ -1,5 +1,5 @@
 import { getNextUpgrade, isZombieUnlocked, MAX_MACHINE_LEVEL, MACHINE_UPGRADES } from "../machine";
-import type { ZombieId } from "../zombies";
+import { Zombies, type ZombieId } from "../zombies";
 
 describe("Machine", () => {
   describe("getNextUpgrade", () => {
@@ -7,7 +7,7 @@ describe("Machine", () => {
       const upgrade = getNextUpgrade(0);
       expect(upgrade).toBeDefined();
       expect(upgrade?.level).toBe(1);
-      expect(upgrade?.unlocks).toBe("giraffe");
+      expect(upgrade?.unlocks).toBe("teacher");
     });
 
     it("returns subsequent upgrades", () => {
@@ -18,8 +18,17 @@ describe("Machine", () => {
 
     it("returns all 11 upgrades in sequence", () => {
       const expectedUnlocks: ZombieId[] = [
-        "giraffe", "penguin", "elephant", "crocodile", "gorilla",
-        "moose", "rhino", "narwhal", "walrus", "zebra", "whale"
+        Zombies.teacher.id,
+        Zombies.penguin.id,
+        Zombies.elephant.id,
+        Zombies.crocodile.id,
+        Zombies.gorilla.id,
+        Zombies.moose.id,
+        Zombies.rhino.id,
+        Zombies.narwhal.id,
+        Zombies.walrus.id,
+        Zombies.zebra.id,
+        Zombies.whale.id
       ];
 
       for (let level = 0; level < 11; level++) {
@@ -37,14 +46,14 @@ describe("Machine", () => {
   });
 
   describe("isZombieUnlocked", () => {
-    it("always unlocks monkey", () => {
-      expect(isZombieUnlocked("monkey", 0)).toBe(true);
-      expect(isZombieUnlocked("monkey", 10)).toBe(true);
+    it("always unlocks officer worker zombies", () => {
+      expect(isZombieUnlocked(Zombies.officerWorker.id, 0)).toBe(true);
+      expect(isZombieUnlocked(Zombies.officerWorker.id, 10)).toBe(true);
     });
 
     it("locks zombies until machine level is reached", () => {
-      expect(isZombieUnlocked("giraffe", 0)).toBe(false);
-      expect(isZombieUnlocked("giraffe", 1)).toBe(true);
+      expect(isZombieUnlocked(Zombies.teacher.id, 0)).toBe(false);
+      expect(isZombieUnlocked(Zombies.teacher.id, 1)).toBe(true);
 
       expect(isZombieUnlocked("penguin", 1)).toBe(false);
       expect(isZombieUnlocked("penguin", 2)).toBe(true);
@@ -52,17 +61,17 @@ describe("Machine", () => {
 
     it("correctly unlocks each zombie at its required level", () => {
       const unlockLevels: Array<{ zombie: ZombieId; level: number }> = [
-        { zombie: "giraffe", level: 1 },
-        { zombie: "penguin", level: 2 },
-        { zombie: "elephant", level: 3 },
-        { zombie: "crocodile", level: 4 },
-        { zombie: "gorilla", level: 5 },
-        { zombie: "moose", level: 6 },
-        { zombie: "rhino", level: 7 },
-        { zombie: "narwhal", level: 8 },
-        { zombie: "walrus", level: 9 },
-        { zombie: "zebra", level: 10 },
-        { zombie: "whale", level: 11 }
+        { zombie: Zombies.teacher.id, level: 1 },
+        { zombie: Zombies.penguin.id, level: 2 },
+        { zombie: Zombies.elephant.id, level: 3 },
+        { zombie: Zombies.crocodile.id, level: 4 },
+        { zombie: Zombies.gorilla.id, level: 5 },
+        { zombie: Zombies.moose.id, level: 6 },
+        { zombie: Zombies.rhino.id, level: 7 },
+        { zombie: Zombies.narwhal.id, level: 8 },
+        { zombie: Zombies.walrus.id, level: 9 },
+        { zombie: Zombies.zebra.id, level: 10 },
+        { zombie: Zombies.whale.id, level: 11 }
       ];
 
       unlockLevels.forEach(({ zombie, level }) => {
@@ -73,9 +82,18 @@ describe("Machine", () => {
 
     it("unlocks all zombies at max level", () => {
       const allZombies: ZombieId[] = [
-        "monkey", "giraffe", "penguin", "elephant",
-        "crocodile", "gorilla", "moose", "rhino",
-        "narwhal", "walrus", "zebra", "whale"
+        Zombies.officerWorker.id,
+        Zombies.teacher.id,
+        Zombies.penguin.id,
+        Zombies.elephant.id,
+        Zombies.crocodile.id,
+        Zombies.gorilla.id,
+        Zombies.moose.id,
+        Zombies.rhino.id,
+        Zombies.narwhal.id,
+        Zombies.walrus.id,
+        Zombies.zebra.id,
+        Zombies.whale.id
       ];
       allZombies.forEach(id => {
         expect(isZombieUnlocked(id, MAX_MACHINE_LEVEL)).toBe(true);
@@ -97,8 +115,17 @@ describe("Machine", () => {
 
     it("each upgrade unlocks a zombie", () => {
       const expectedUnlocks: ZombieId[] = [
-        "giraffe", "penguin", "elephant", "crocodile", "gorilla",
-        "moose", "rhino", "narwhal", "walrus", "zebra", "whale"
+        Zombies.teacher.id,
+        Zombies.penguin.id,
+        Zombies.elephant.id,
+        Zombies.crocodile.id,
+        Zombies.gorilla.id,
+        Zombies.moose.id,
+        Zombies.rhino.id,
+        Zombies.narwhal.id,
+        Zombies.walrus.id,
+        Zombies.zebra.id,
+        Zombies.whale.id
       ];
 
       MACHINE_UPGRADES.forEach((upgrade, index) => {
@@ -108,10 +135,17 @@ describe("Machine", () => {
 
     it("each upgrade has a name", () => {
       const expectedNames = [
-        "Giraffe Habitat", "Penguin Enclosure", "Elephant Sanctuary",
-        "Crocodile Swamp", "Gorilla Jungle", "Moose Meadow",
-        "Rhino Ranch", "Narwhal Iceberg", "Walrus Tundra",
-        "Zebra Savanna", "Whale Ocean"
+        "Teacher Habitat",
+        "Penguin Enclosure",
+        "Elephant Sanctuary",
+        "Crocodile Swamp",
+        "Gorilla Jungle",
+        "Moose Meadow",
+        "Rhino Ranch",
+        "Narwhal Iceberg",
+        "Walrus Tundra",
+        "Zebra Savanna",
+        "Whale Ocean"
       ];
 
       MACHINE_UPGRADES.forEach((upgrade, index) => {

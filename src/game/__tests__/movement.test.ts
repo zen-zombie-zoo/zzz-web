@@ -1,12 +1,4 @@
-import {
-  type Entity,
-  type Bounds,
-  ZOMBIE_SPEED,
-  VISITOR_SPEED,
-  createCardinalVelocity,
-  updateZombieMovement,
-  updateVisitorMovement,
-} from "../movement";
+import { type Entity, type Bounds, ZOMBIE_SPEED, VISITOR_SPEED, createCardinalVelocity, updateZombieMovement, updateVisitorMovement } from "../movement";
 
 describe("movement", () => {
   describe("constants", () => {
@@ -24,8 +16,7 @@ describe("movement", () => {
       for (let i = 0; i < 100; i++) {
         const { vx, vy } = createCardinalVelocity(10);
         // One must be 0, the other non-zero
-        const isCardinal =
-          (vx === 0 && vy !== 0) || (vx !== 0 && vy === 0);
+        const isCardinal = (vx === 0 && vy !== 0) || (vx !== 0 && vy === 0);
         expect(isCardinal).toBe(true);
       }
     });
@@ -62,7 +53,7 @@ describe("movement", () => {
       width: 800,
       height: 600,
       padding: 10,
-      topPadding: 30,
+      topPadding: 30
     };
     const entitySize = 48;
 
@@ -99,7 +90,7 @@ describe("movement", () => {
         x: bounds.width - entitySize - 5,
         y: 100,
         vx: ZOMBIE_SPEED,
-        vy: 0,
+        vy: 0
       };
       vi.spyOn(Math, "random").mockReturnValue(1);
 
@@ -130,7 +121,7 @@ describe("movement", () => {
         x: 100,
         y: bounds.height - entitySize - 5,
         vx: 0,
-        vy: ZOMBIE_SPEED,
+        vy: ZOMBIE_SPEED
       };
       vi.spyOn(Math, "random").mockReturnValue(1);
 
@@ -150,9 +141,7 @@ describe("movement", () => {
       updateZombieMovement(entity, bounds, entitySize, 0.1);
 
       // Should only move in one direction after bounce
-      const isCardinal =
-        (entity.vx === 0 && entity.vy !== 0) ||
-        (entity.vx !== 0 && entity.vy === 0);
+      const isCardinal = (entity.vx === 0 && entity.vy !== 0) || (entity.vx !== 0 && entity.vy === 0);
       expect(isCardinal).toBe(true);
 
       vi.restoreAllMocks();
@@ -164,7 +153,7 @@ describe("movement", () => {
       width: 800,
       height: 600,
       padding: 10,
-      topPadding: 30,
+      topPadding: 30
     };
     const entitySize = 24;
 
@@ -202,7 +191,7 @@ describe("movement", () => {
         x: bounds.width - entitySize - 5,
         y: 100,
         vx: 15,
-        vy: 10,
+        vy: 10
       };
 
       updateVisitorMovement(entity, bounds, entitySize, 0.1);
@@ -227,7 +216,7 @@ describe("movement", () => {
         x: 100,
         y: bounds.height - entitySize - 5,
         vx: 15,
-        vy: 10,
+        vy: 10
       };
 
       updateVisitorMovement(entity, bounds, entitySize, 0.1);

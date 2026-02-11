@@ -40,10 +40,10 @@ describe("GameProvider", () => {
         <TestComponent />
       </GameProvider>
     );
-    
+
     const button = screen.getByText("Click");
     button.click();
-    
+
     // After clicking, brains should increase from 100 to 101
     await waitFor(() => {
       expect(screen.getByText(/101/)).toBeInTheDocument();
@@ -56,7 +56,7 @@ describe("GameProvider", () => {
         <TestComponent />
       </GameProvider>
     );
-    
+
     // Should start with 100 brains
     expect(screen.getByText(/100/)).toBeInTheDocument();
   });

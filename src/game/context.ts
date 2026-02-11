@@ -11,6 +11,7 @@ export type GameCtxType = {
   spawnVisitor: () => void;
   upgradeMachine: () => void;
   dismissAchievement: () => void;
+  activateBoost: (boostId: string) => void;
 };
 
 export const GameCtx = createContext<GameCtxType | null>(null);

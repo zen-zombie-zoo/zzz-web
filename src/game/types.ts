@@ -1,5 +1,6 @@
 import type { ZombieId } from "./zombies";
 import type { AchievementState } from "./achievements";
+import type { ActiveBoost } from "./boosts";
 
 export interface GameState {
   version: number;
@@ -16,4 +17,6 @@ export interface GameState {
   visitorRate: number;
   machineLevel: number;
   achievements: AchievementState;
+  reputation: number;
+  activeBoosts: ActiveBoost[];
 }

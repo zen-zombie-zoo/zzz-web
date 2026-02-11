@@ -24,19 +24,14 @@ export function createCardinalVelocity(speed: number): { vx: number; vy: number 
   const dir = Math.floor(Math.random() * 4);
   return {
     vx: dir === 0 ? speed : dir === 2 ? -speed : 0,
-    vy: dir === 1 ? speed : dir === 3 ? -speed : 0,
+    vy: dir === 1 ? speed : dir === 3 ? -speed : 0
   };
 }
 
 /**
  * Updates a zombie's position with cardinal movement and random turning
  */
-export function updateZombieMovement(
-  entity: Entity,
-  bounds: Bounds,
-  entitySize: number,
-  dt: number
-): void {
+export function updateZombieMovement(entity: Entity, bounds: Bounds, entitySize: number, dt: number): void {
   const { width, height, padding, topPadding } = bounds;
 
   // Update position
@@ -93,12 +88,7 @@ export function updateZombieMovement(
 /**
  * Updates a visitor's position with free movement (diagonal allowed)
  */
-export function updateVisitorMovement(
-  entity: Entity,
-  bounds: Bounds,
-  entitySize: number,
-  dt: number
-): void {
+export function updateVisitorMovement(entity: Entity, bounds: Bounds, entitySize: number, dt: number): void {
   const { width, height, padding, topPadding } = bounds;
 
   // Update position
@@ -122,4 +112,24 @@ export function updateVisitorMovement(
     entity.y = height - entitySize - padding;
     entity.vy = -Math.abs(entity.vy);
   }
+}
+
+/**
+ * Updates a visitor's velocity to move toward the gate
+ */
+export function updateVisitorLeaving(entity: Entity, gateX: number, gateY: number, dt: number): void {
+  // Calculate direction to gate center
+  const dx = gateX - entity.x;
+  const dy = gateY - entity.y;
+  const dist = Math.sqrt(dx * dx + dy * dy);
+
+  if (dist > 0) {
+    // Normalize and apply speed
+    entity.vx = (dx / dist) * VISITOR_SPEED;
+    entity.vy = (dy / dist) * VISITOR_SPEED;
+  }
+
+  // Update position
+  entity.x += entity.vx * dt;
+  entity.y += entity.vy * dt;
 }

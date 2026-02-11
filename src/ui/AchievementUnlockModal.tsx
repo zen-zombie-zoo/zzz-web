@@ -62,7 +62,9 @@ const Content = styled.div`
   background: ${theme.bgPanel};
   border-radius: ${theme.radiusXl};
   border: 2px solid ${theme.colorAccent};
-  animation: ${popIn} 0.4s ease-out, ${glow} 2s ease-in-out infinite;
+  animation:
+    ${popIn} 0.4s ease-out,
+    ${glow} 2s ease-in-out infinite;
   text-align: center;
   max-width: 360px;
 `;
@@ -118,10 +120,7 @@ const DismissButton = styled.button`
   }
 `;
 
-export const AchievementUnlockModal: React.FC<Props> = ({
-  achievementId,
-  onDismiss
-}) => {
+export const AchievementUnlockModal: React.FC<Props> = ({ achievementId, onDismiss }) => {
   const achievement = getAchievementById(achievementId);
 
   if (!achievement) return null;

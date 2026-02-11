@@ -11,7 +11,8 @@ const mockGameContext: GameCtxType = {
   collectBrain: vi.fn(),
   spawnVisitor: vi.fn(),
   upgradeMachine: vi.fn(),
-  dismissAchievement: vi.fn()
+  dismissAchievement: vi.fn(),
+  activateBoost: vi.fn()
 };
 
 describe("Header", () => {
@@ -22,11 +23,7 @@ describe("Header", () => {
 
     render(
       <GameCtx.Provider value={mockGameContext}>
-        <Header
-          onHelpClick={onHelpClick}
-          onSettingsClick={onSettingsClick}
-          onAchievementsClick={onAchievementsClick}
-        />
+        <Header onHelpClick={onHelpClick} onSettingsClick={onSettingsClick} onAchievementsClick={onAchievementsClick} />
       </GameCtx.Provider>
     );
 
@@ -43,11 +40,7 @@ describe("Header", () => {
 
     render(
       <GameCtx.Provider value={mockGameContext}>
-        <Header
-          onHelpClick={onHelpClick}
-          onSettingsClick={onSettingsClick}
-          onAchievementsClick={onAchievementsClick}
-        />
+        <Header onHelpClick={onHelpClick} onSettingsClick={onSettingsClick} onAchievementsClick={onAchievementsClick} />
       </GameCtx.Provider>
     );
 
@@ -64,11 +57,7 @@ describe("Header", () => {
 
     render(
       <GameCtx.Provider value={mockGameContext}>
-        <Header
-          onHelpClick={onHelpClick}
-          onSettingsClick={onSettingsClick}
-          onAchievementsClick={onAchievementsClick}
-        />
+        <Header onHelpClick={onHelpClick} onSettingsClick={onSettingsClick} onAchievementsClick={onAchievementsClick} />
       </GameCtx.Provider>
     );
 

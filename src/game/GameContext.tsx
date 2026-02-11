@@ -68,7 +68,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       collectBrain: (amount?: number) => dispatch({ type: "CLICK", amount }),
       spawnVisitor: () => dispatch({ type: "SPAWN_VISITOR" }),
       upgradeMachine: () => dispatch({ type: "UPGRADE_MACHINE" }),
-      dismissAchievement: () => dispatch({ type: "DISMISS_ACHIEVEMENT" })
+      dismissAchievement: () => dispatch({ type: "DISMISS_ACHIEVEMENT" }),
+      activateBoost: (boostId: string) => dispatch({ type: "ACTIVATE_BOOST", boostId })
     }),
     [state]
   );

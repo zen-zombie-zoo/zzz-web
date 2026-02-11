@@ -38,10 +38,7 @@ const ContinueButton = styled.button`
 export const EarlyAccessModal: React.FC<Props> = ({ onClose }) => {
   return (
     <Container>
-      <Description>
-        Welcome! This game is still a work in progress. Some features may be
-        incomplete or change over time. Thanks for checking it out!
-      </Description>
+      <Description>Welcome! This game is still a work in progress. Some features may be incomplete or change over time. Thanks for checking it out!</Description>
 
       <ContinueButton onClick={onClose}>Got it</ContinueButton>
     </Container>

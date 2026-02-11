@@ -15,12 +15,14 @@ npm run test:coverage
 ```
 
 ### Configuration Files
+
 - **vitest.config.ts** - Vitest configuration with jsdom environment
 - **src/test/setup.ts** - Global test setup with auto-cleanup between tests
 
 ## Key Test Scenarios
 
 ### Economy
+
 - ✅ Single vs. multiple unit purchases
 - ✅ Exponential cost growth
 - ✅ Production from zombies with multipliers
@@ -28,17 +30,20 @@ npm run test:coverage
 - ✅ Brains accumulation over time
 
 ### Save/Load
+
 - ✅ Persistence to localStorage
 - ✅ Offline progress calculation
 - ✅ 8-hour clamping for sanity
 - ✅ Save deletion
 
 ### Upgrades
+
 - ✅ Machine progression
 - ✅ Zombie unlocking via levels
 - ✅ Increasing upgrade costs
 
 ### UI
+
 - ✅ Modal visibility and interactions
 - ✅ Resource panel displays
 - ✅ Number formatting
@@ -47,6 +52,7 @@ npm run test:coverage
 ## Troubleshooting
 
 ### Tests won't run
+
 ```bash
 # Clear node_modules and reinstall
 rm -rf node_modules
@@ -55,6 +61,7 @@ npm test -- --run
 ```
 
 ### Watch mode issues
+
 ```bash
 # Run in single-pass mode for CI
 npm test -- --run

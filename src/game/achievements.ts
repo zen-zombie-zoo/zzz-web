@@ -137,12 +137,12 @@ export const ACHIEVEMENTS: AchievementDef[] = [
     check: (_, state) => getTotalOwned(state) >= 1000
   },
   {
-    id: "monkey_master",
-    name: "Monkey Business",
-    description: "Own 25 monkeys",
+    id: "office_boss",
+    name: "Office Boss",
+    description: "Own 25 officer worker zombies",
     category: "collection",
     icon: "🐵",
-    check: (_, state) => getOwnedCount(state, "monkey") >= 25
+    check: (_, state) => getOwnedCount(state, Zombies.officerWorker.id) >= 25
   },
   {
     id: "whale_owner",
@@ -150,7 +150,7 @@ export const ACHIEVEMENTS: AchievementDef[] = [
     description: "Own at least 1 whale",
     category: "collection",
     icon: "🐋",
-    check: (_, state) => getOwnedCount(state, "whale") >= 1
+    check: (_, state) => getOwnedCount(state, Zombies.whale.id) >= 1
   },
   {
     id: "one_of_each",
@@ -208,11 +208,7 @@ export function getAchievementById(id: string): AchievementDef | undefined {
   return ACHIEVEMENTS.find(a => a.id === id);
 }
 
-export function checkForNewAchievements(
-  stats: PlayerStats,
-  state: GameState,
-  unlockedIds: string[]
-): string | null {
+export function checkForNewAchievements(stats: PlayerStats, state: GameState, unlockedIds: string[]): string | null {
   for (const achievement of ACHIEVEMENTS) {
     if (unlockedIds.includes(achievement.id)) continue;
     if (achievement.check(stats, state)) {
