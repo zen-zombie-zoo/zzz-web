@@ -14,7 +14,7 @@ const TestComponent = () => {
   const { state, collectBrain } = useGame();
   return (
     <div>
-      <span>{Math.floor(state.gold)}</span>
+      <span>{Math.floor(state.brains)}</span>
       <button onClick={() => collectBrain()}>Click</button>
     </div>
   );
@@ -34,17 +34,17 @@ describe("GameProvider", () => {
     expect(screen.getByText(/100/)).toBeInTheDocument();
   });
 
-  it("allows clicking to increase gold", async () => {
+  it("allows clicking to increase brains", async () => {
     render(
       <GameProvider>
         <TestComponent />
       </GameProvider>
     );
-    
+
     const button = screen.getByText("Click");
     button.click();
-    
-    // After clicking, gold should increase from 100 to 101
+
+    // After clicking, brains should increase from 100 to 101
     await waitFor(() => {
       expect(screen.getByText(/101/)).toBeInTheDocument();
     });
@@ -56,8 +56,8 @@ describe("GameProvider", () => {
         <TestComponent />
       </GameProvider>
     );
-    
-    // Should start with 100 gold
+
+    // Should start with 100 brains
     expect(screen.getByText(/100/)).toBeInTheDocument();
   });
 });

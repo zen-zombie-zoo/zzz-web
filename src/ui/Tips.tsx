@@ -21,6 +21,7 @@ const List = styled.ul`
   line-height: ${theme.lineHeightRelaxed};
   color: ${theme.textMuted};
   font-size: ${theme.fontSizeSm};
+  list-style-type: none;
 
   li {
     margin-bottom: ${theme.spacingSm};
@@ -35,23 +36,18 @@ export const Tips: React.FC = () => {
   return (
     <div>
       <Intro>
-        Grow your zombie collections to attract more zoo visitors and "earn"
-        brains over time (in a totally legal way, of course). Use the brains to
-        buy more zombies and unlock new types!
+        Grow your zombie collections to attract more zoo visitors and "earn" brains over time (in a totally legal way, of course). Use the brains to buy more zombies and
+        unlock new types!
       </Intro>
 
       <Heading>Tips</Heading>
       <List>
-        <li>
-          Buy zombies to increase your brain production, and attact more
-          visitors to your zoo
-        </li>
+        <li>Buy zombies to increase your brain production, and attract more visitors to your zoo</li>
         <li>Each zombie type produces different amounts of brains per second</li>
-        <li>
-          New zombie types unlock when you upgrade the Zombieficator Machine
-        </li>
+        <li>New zombie types unlock when you upgrade the Zombieficator Machine</li>
         <li>The game saves automatically every 5 seconds</li>
         <li>You earn offline progress when you return!</li>
+        <li>Hint: visitors also give brains ;)</li>
       </List>
     </div>
   );

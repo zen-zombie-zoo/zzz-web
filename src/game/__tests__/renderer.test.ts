@@ -1,13 +1,5 @@
-import {
-  ZOMBIE_SIZE,
-  VISITOR_SIZE,
-  MACHINE_SIZE,
-  MACHINE_PADDING,
-  drawZombie,
-  drawVisitor,
-  drawFloatingText,
-  clearCanvas,
-} from "../renderer";
+import { ZOMBIE_SIZE, VISITOR_SIZE, MACHINE_SIZE, MACHINE_PADDING, drawZombie, drawVisitor, drawFloatingText, clearCanvas } from "../renderer";
+import { Zombies } from "../zombies";
 
 // Mock canvas context
 function createMockContext(): CanvasRenderingContext2D {
@@ -26,7 +18,7 @@ function createMockContext(): CanvasRenderingContext2D {
     fillRect: vi.fn(),
     clearRect: vi.fn(),
     drawImage: vi.fn(),
-    roundRect: vi.fn(),
+    roundRect: vi.fn()
   } as unknown as CanvasRenderingContext2D;
 }
 
@@ -92,13 +84,12 @@ describe("renderer", () => {
     });
   });
 
-
   describe("drawZombie", () => {
     it("draws fallback circle when image not loaded", () => {
       const ctx = createMockContext();
 
       // Images won't be loaded in test environment
-      drawZombie(ctx, "monkey", 100, 100);
+      drawZombie(ctx, Zombies.officerWorker.id, 100, 100);
 
       expect(ctx.beginPath).toHaveBeenCalled();
       expect(ctx.arc).toHaveBeenCalled();

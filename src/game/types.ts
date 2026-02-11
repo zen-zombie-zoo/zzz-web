@@ -1,9 +1,11 @@
 import type { ZombieId } from "./zombies";
+import type { AchievementState } from "./achievements";
+import type { ActiveBoost } from "./boosts";
 
 export interface GameState {
   version: number;
-  gold: number;
-  goldPerSecond: number;
+  brains: number;
+  brainsPerSecond: number;
   clickPower: number;
   generators: Record<ZombieId, { owned: number }>;
   multipliers: {
@@ -14,4 +16,7 @@ export interface GameState {
   money: number;
   visitorRate: number;
   machineLevel: number;
+  achievements: AchievementState;
+  reputation: number;
+  activeBoosts: ActiveBoost[];
 }

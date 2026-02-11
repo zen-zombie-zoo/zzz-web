@@ -73,14 +73,14 @@ export const ResourcePanel: React.FC = () => {
       <Row>
         <Label>Brains</Label>
         <Value variant="accent">
-          {Math.floor(state.gold).toLocaleString()}
+          {Math.floor(state.brains).toLocaleString()}
           <img src={brain} alt="" width="14" height="14" />
         </Value>
       </Row>
       <Row>
         <Label>Production</Label>
         <Badge>
-          +{state.goldPerSecond.toFixed(1)}
+          +{state.brainsPerSecond.toFixed(1)}
           <img src={brain} alt="" width="12" height="12" />
           /s
         </Badge>

@@ -1,14 +1,12 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import styled from "@emotion/styled";
 import { useGame } from "../game/useGame";
-import {
-  getNextUpgrade,
-  MAX_MACHINE_LEVEL,
-  isZombieUnlocked,
-} from "../game/machine";
+import { getNextUpgrade, MAX_MACHINE_LEVEL, isZombieUnlocked } from "../game/machine";
 import { Zombies, type ZombieId } from "../game/zombies";
 import { nextUnitCost, totalCostForQuantity } from "../game/economy";
 import { theme } from "../theme";
+import { BOOSTS, isBoostActive, getRemainingTime } from "../game/boosts";
+import { SYNERGIES, getActiveSynergies } from "../game/synergy";
 
 const Resources = styled.div`
   display: flex;
@@ -101,11 +99,7 @@ const UpgradeCard = styled.div`
 
 const UpgradeCardMaxed = styled.div`
   padding: ${theme.spacingXl};
-  background: linear-gradient(
-    135deg,
-    ${theme.colorSuccess} 0%,
-    ${theme.colorSuccessLight} 100%
-  );
+  background: linear-gradient(135deg, ${theme.colorSuccess} 0%, ${theme.colorSuccessLight} 100%);
   border-radius: ${theme.radiusMd};
   text-align: center;
   box-shadow: ${theme.shadowGlowSuccess};
@@ -162,19 +156,114 @@ const NeedMore = styled.div`
   text-align: center;
 `;
 
+const BoostItem = styled.div<{ active?: boolean }>`
+  margin-bottom: ${theme.spacingMd};
+  padding: ${theme.spacingLg};
+  background: ${props => (props.active ? theme.colorWarningDim : theme.bgCard)};
+  border-radius: ${theme.radiusMd};
+  border: 1px solid ${props => (props.active ? theme.colorWarning : theme.borderSubtle)};
+  transition: all ${theme.transitionFast};
+`;
+
+const BoostHeader = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${theme.spacingMd};
+  margin-bottom: ${theme.spacingSm};
+`;
+
+const BoostIcon = styled.span`
+  font-size: 20px;
+`;
+
+const BoostName = styled.div`
+  font-weight: ${theme.fontWeightSemibold};
+`;
+
+const BoostDesc = styled.div`
+  color: ${theme.textMuted};
+  font-size: ${theme.fontSizeXs};
+  margin-bottom: ${theme.spacingMd};
+`;
+
+const BoostButton = styled.button<{ active?: boolean }>`
+  width: 100%;
+  padding: ${theme.spacingSm} ${theme.spacingLg};
+  font-size: ${theme.fontSizeSm};
+  background: ${props => (props.active ? theme.colorWarning : theme.bgButton)};
+  color: ${props => (props.active ? theme.bgCard : theme.textPrimary)};
+
+  &:disabled {
+    opacity: 0.5;
+  }
+`;
+
+const SynergyItem = styled.div<{ active?: boolean }>`
+  margin-bottom: ${theme.spacingMd};
+  padding: ${theme.spacingMd};
+  background: ${props => (props.active ? theme.colorAccentDim : theme.bgCard)};
+  border-radius: ${theme.radiusMd};
+  border: 1px solid ${props => (props.active ? theme.colorAccent : theme.borderSubtle)};
+  opacity: ${props => (props.active ? 1 : 0.5)};
+`;
+
+const SynergyHeader = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${theme.spacingSm};
+  font-weight: ${theme.fontWeightSemibold};
+  font-size: ${theme.fontSizeSm};
+`;
+
+const SynergyBonus = styled.div`
+  color: ${theme.colorAccent};
+  font-size: ${theme.fontSizeXs};
+  margin-top: ${theme.spacingXs};
+`;
+
+const TabContainer = styled.div`
+  display: flex;
+  gap: ${theme.spacingSm};
+  margin-bottom: ${theme.spacingLg};
+`;
+
+const Tab = styled.button<{ active?: boolean }>`
+  flex: 1;
+  padding: ${theme.spacingMd};
+  font-size: ${theme.fontSizeSm};
+  background: ${props => (props.active ? theme.colorPrimary : theme.bgCard)};
+  border: 1px solid ${props => (props.active ? theme.colorPrimary : theme.borderSubtle)};
+  color: ${props => (props.active ? "#fff" : theme.textSecondary)};
+  border-radius: ${theme.radiusMd};
+
+  &:hover {
+    background: ${props => (props.active ? theme.colorPrimaryHover : theme.bgButton)};
+  }
+`;
+
 export const MachineModal: React.FC = () => {
-  const { state, upgradeMachine, buyZombie } = useGame();
+  const { state, upgradeMachine, buyZombie, activateBoost } = useGame();
   const nextUpgrade = getNextUpgrade(state.machineLevel);
   const isMaxed = state.machineLevel >= MAX_MACHINE_LEVEL;
+  const [rightTab, setRightTab] = useState<"machine" | "boosts" | "synergies">("machine");
+  const [, setTick] = useState(0);
+
+  // Update every second for boost timers
+  useEffect(() => {
+    const id = setInterval(() => setTick(t => t + 1), 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  const activeSynergies = getActiveSynergies(state);
 
   return (
     <div>
       <Resources>
         <div>
-          <strong>Brains:</strong> {Math.floor(state.gold).toLocaleString()}
+          <strong>Brains:</strong> {Math.floor(state.brains).toLocaleString()}
         </div>
         <div>
-          <strong>Coins:</strong> ${state.money.toLocaleString()}
+          <strong>Coins:</strong> ${Math.floor(state.money).toLocaleString()}
         </div>
       </Resources>
 
@@ -199,16 +288,10 @@ export const MachineModal: React.FC = () => {
                       </ZombieMeta>
                     </div>
                     <ZombieButtons>
-                      <BuyButton
-                        onClick={() => buyZombie(id, 1)}
-                        disabled={state.gold < cost1}
-                      >
+                      <BuyButton onClick={() => buyZombie(id, 1)} disabled={state.brains < cost1}>
                         +1 ({Math.floor(cost1).toLocaleString()})
                       </BuyButton>
-                      <BuyButton
-                        onClick={() => buyZombie(id, 10)}
-                        disabled={state.gold < cost10}
-                      >
+                      <BuyButton onClick={() => buyZombie(id, 10)} disabled={state.brains < cost10}>
                         +10
                       </BuyButton>
                     </ZombieButtons>
@@ -219,36 +302,94 @@ export const MachineModal: React.FC = () => {
         </Column>
 
         <Column>
-          <SectionTitle>
-            Machine · Level {state.machineLevel}/{MAX_MACHINE_LEVEL}
-          </SectionTitle>
+          <TabContainer>
+            <Tab active={rightTab === "machine"} onClick={() => setRightTab("machine")}>
+              Machine
+            </Tab>
+            <Tab active={rightTab === "boosts"} onClick={() => setRightTab("boosts")}>
+              Boosts
+            </Tab>
+            <Tab active={rightTab === "synergies"} onClick={() => setRightTab("synergies")}>
+              Synergies {activeSynergies.length > 0 && `(${activeSynergies.length})`}
+            </Tab>
+          </TabContainer>
 
-          {isMaxed ? (
-            <UpgradeCardMaxed>
-              <strong>Fully Upgraded!</strong>
-              <MaxedSubtitle>All species unlocked</MaxedSubtitle>
-            </UpgradeCardMaxed>
-          ) : (
-            nextUpgrade && (
-              <UpgradeCard>
-                <NextTitle>
-                  <strong>{nextUpgrade.name}</strong>
-                </NextTitle>
-                <Unlocks>Unlocks {Zombies[nextUpgrade.unlocks].name}</Unlocks>
-                <UpgradeButton
-                  onClick={upgradeMachine}
-                  disabled={state.money < nextUpgrade.cost}
-                >
-                  Upgrade · ${nextUpgrade.cost}
-                </UpgradeButton>
-                {state.money < nextUpgrade.cost && (
-                  <NeedMore>
-                    Need ${(nextUpgrade.cost - state.money).toLocaleString()}{" "}
-                    more coins
-                  </NeedMore>
-                )}
-              </UpgradeCard>
-            )
+          {rightTab === "machine" && (
+            <>
+              <SectionTitle>
+                Level {state.machineLevel}/{MAX_MACHINE_LEVEL}
+              </SectionTitle>
+
+              {isMaxed ? (
+                <UpgradeCardMaxed>
+                  <strong>Fully Upgraded!</strong>
+                  <MaxedSubtitle>All species unlocked</MaxedSubtitle>
+                </UpgradeCardMaxed>
+              ) : (
+                nextUpgrade && (
+                  <UpgradeCard>
+                    <NextTitle>
+                      <strong>{nextUpgrade.name}</strong>
+                    </NextTitle>
+                    <Unlocks>Unlocks {Zombies[nextUpgrade.unlocks].name}</Unlocks>
+                    <UpgradeButton onClick={upgradeMachine} disabled={state.money < nextUpgrade.cost}>
+                      Upgrade · ${nextUpgrade.cost.toLocaleString()}
+                    </UpgradeButton>
+                    {state.money < nextUpgrade.cost && <NeedMore>Need ${(nextUpgrade.cost - state.money).toLocaleString()} more coins</NeedMore>}
+                  </UpgradeCard>
+                )
+              )}
+            </>
+          )}
+
+          {rightTab === "boosts" && (
+            <>
+              <SectionTitle>Temporary Boosts</SectionTitle>
+              {BOOSTS.map(boost => {
+                const active = isBoostActive(state.activeBoosts ?? [], boost.id);
+                const remaining = getRemainingTime(state.activeBoosts ?? [], boost.id);
+
+                return (
+                  <BoostItem key={boost.id} active={active}>
+                    <BoostHeader>
+                      <BoostIcon>{boost.icon}</BoostIcon>
+                      <BoostName>{boost.name}</BoostName>
+                    </BoostHeader>
+                    <BoostDesc>{boost.description}</BoostDesc>
+                    <BoostButton active={active} onClick={() => activateBoost(boost.id)} disabled={active || state.money < boost.cost}>
+                      {active ? `Active (${remaining}s)` : `Activate · $${boost.cost}`}
+                    </BoostButton>
+                  </BoostItem>
+                );
+              })}
+            </>
+          )}
+
+          {rightTab === "synergies" && (
+            <>
+              <SectionTitle>Zoo Synergies</SectionTitle>
+              {SYNERGIES.map(synergy => {
+                const active = activeSynergies.some(s => s.id === synergy.id);
+                const bonusText =
+                  synergy.bonus.type === "production"
+                    ? `+${Math.round((synergy.bonus.multiplier - 1) * 100)}% brain production`
+                    : synergy.bonus.type === "visitors"
+                      ? `+${Math.round((synergy.bonus.multiplier - 1) * 100)}% visitor rate`
+                      : `+${Math.round((synergy.bonus.multiplier - 1) * 100)}% to everything`;
+
+                return (
+                  <SynergyItem key={synergy.id} active={active}>
+                    <SynergyHeader>
+                      <span>{synergy.icon}</span>
+                      <span>{synergy.name}</span>
+                      {active && <span>✓</span>}
+                    </SynergyHeader>
+                    <BoostDesc>{synergy.description}</BoostDesc>
+                    <SynergyBonus>{active ? bonusText : `Requires: ${synergy.requires.map(r => `${r.count}x ${Zombies[r.id].name}`).join(", ")}`}</SynergyBonus>
+                  </SynergyItem>
+                );
+              })}
+            </>
           )}
         </Column>
       </Columns>

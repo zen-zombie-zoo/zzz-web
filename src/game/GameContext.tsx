@@ -65,9 +65,11 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       state,
       buyZombie: (id, qty = 1) => dispatch({ type: "BUY_ANIMAL", id, qty }),
       nextCost: id => nextUnitCost(Zombies[id], state.generators[id]?.owned ?? 0),
-      collectBrain: () => dispatch({ type: "CLICK" }),
+      collectBrain: (amount?: number) => dispatch({ type: "CLICK", amount }),
       spawnVisitor: () => dispatch({ type: "SPAWN_VISITOR" }),
-      upgradeMachine: () => dispatch({ type: "UPGRADE_MACHINE" })
+      upgradeMachine: () => dispatch({ type: "UPGRADE_MACHINE" }),
+      dismissAchievement: () => dispatch({ type: "DISMISS_ACHIEVEMENT" }),
+      activateBoost: (boostId: string) => dispatch({ type: "ACTIVATE_BOOST", boostId })
     }),
     [state]
   );

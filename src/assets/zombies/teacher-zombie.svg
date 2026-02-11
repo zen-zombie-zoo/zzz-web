@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- Body/Head (round style) -->
+  <circle cx="64" cy="68" r="52" fill="#8bc98b"/>
+
+  <!-- Darker shading on side -->
+  <ellipse cx="38" cy="68" rx="12" ry="30" fill="#6aaa6a" opacity="0.4"/>
+
+  <!-- Cardigan/sweater collar -->
+  <path d="M30 100 Q64 90 98 100 L98 120 L30 120 Z" fill="#8b5a3c"/>
+  <path d="M45 100 Q64 95 83 100 L83 120 L45 120 Z" fill="#d4a574"/>
+
+  <!-- Glasses -->
+  <rect x="28" y="48" width="28" height="22" rx="4" fill="none" stroke="#4a3a2a" stroke-width="3"/>
+  <rect x="72" y="48" width="28" height="22" rx="4" fill="none" stroke="#4a3a2a" stroke-width="3"/>
+  <line x1="56" y1="58" x2="72" y2="58" stroke="#4a3a2a" stroke-width="3"/>
+  <line x1="28" y1="58" x2="20" y2="54" stroke="#4a3a2a" stroke-width="2"/>
+  <line x1="100" y1="58" x2="108" y2="54" stroke="#4a3a2a" stroke-width="2"/>
+
+  <!-- Left eye (behind glasses, tired) -->
+  <ellipse cx="42" cy="58" rx="8" ry="9" fill="#f0f0e8"/>
+  <circle cx="44" cy="60" r="5" fill="#333"/>
+  <circle cx="46" cy="58" r="1.5" fill="#fff"/>
+
+  <!-- Right eye (behind glasses, half-closed) -->
+  <ellipse cx="86" cy="58" rx="8" ry="6" fill="#f0f0e8"/>
+  <circle cx="85" cy="59" r="4" fill="#333"/>
+  <circle cx="84" cy="57" r="1.5" fill="#fff"/>
+
+  <!-- Eye bags -->
+  <path d="M34 68 Q42 74 50 68" stroke="#6a9a6a" stroke-width="2" fill="none"/>
+  <path d="M78 66 Q86 70 94 66" stroke="#6a9a6a" stroke-width="2" fill="none"/>
+
+  <!-- Eyebrows (one raised) -->
+  <path d="M30 42 Q42 38 54 44" stroke="#5a4a3a" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M74 40 Q86 44 98 42" stroke="#5a4a3a" stroke-width="3" fill="none" stroke-linecap="round"/>
+
+  <!-- Mouth (exhausted smile) -->
+  <path d="M48 85 Q64 92 80 85" stroke="#4a6a4a" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <line x1="48" y1="85" x2="45" y2="83" stroke="#4a6a4a" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- Hair bun -->
+  <ellipse cx="64" cy="20" rx="18" ry="14" fill="#5a4a3a"/>
+  <ellipse cx="64" cy="22" rx="12" ry="10" fill="#6a5a4a"/>
+
+  <!-- Hair wisps escaping -->
+  <path d="M40 28 Q35 20 42 15" stroke="#5a4a3a" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <path d="M88 28 Q93 20 86 15" stroke="#5a4a3a" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <path d="M50 22 Q48 12 55 10" stroke="#6a5a4a" stroke-width="2" fill="none" stroke-linecap="round"/>
+
+  <!-- Pencil behind ear -->
+  <rect x="14" y="40" width="4" height="28" rx="1" fill="#f4d03f" transform="rotate(-15 16 54)"/>
+  <polygon points="14,68 16,75 18,68" fill="#e8c4a0" transform="rotate(-15 16 54)"/>
+  <rect x="14" y="40" width="4" height="5" rx="1" fill="#e87a7a" transform="rotate(-15 16 54)"/>
+
+  <!-- Apple (small, on the side) -->
+  <circle cx="105" cy="95" r="10" fill="#e74c3c"/>
+  <ellipse cx="105" cy="87" rx="2" ry="3" fill="#27ae60"/>
+  <path d="M105 85 Q108 82 107 80" stroke="#5d4037" stroke-width="1.5" fill="none"/>
+</svg>

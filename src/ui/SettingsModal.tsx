@@ -82,11 +82,7 @@ const Version = styled.p`
 
 export const SettingsModal: React.FC = () => {
   const handleClearSave = () => {
-    if (
-      window.confirm(
-        "Are you sure you want to clear all progress? This cannot be undone."
-      )
-    ) {
+    if (window.confirm("Are you sure you want to clear all progress? This cannot be undone.")) {
       wipeSave();
       window.location.reload();
     }
@@ -109,8 +105,7 @@ export const SettingsModal: React.FC = () => {
         <SectionTitle>About</SectionTitle>
         <About>
           <p>
-            <strong>Zen Zombie Zoo</strong> is an idle game where you collect
-            zombie animals to attract visitors and earn brains.
+            <strong>Zen Zombie Zoo</strong> is an idle game where you collect zombie animals to attract visitors and earn brains.
           </p>
           <Version>Version 1.0.2</Version>
         </About>

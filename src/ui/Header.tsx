@@ -2,10 +2,12 @@ import React from "react";
 import styled from "@emotion/styled";
 import { useGame } from "../game/useGame";
 import { theme } from "../theme";
+import { getEntryFee } from "../game/economy";
 
 type Props = {
   onHelpClick: () => void;
   onSettingsClick: () => void;
+  onAchievementsClick: () => void;
 };
 
 const HeaderContainer = styled.header`
@@ -18,11 +20,7 @@ const HeaderContainer = styled.header`
   align-items: center;
   justify-content: space-between;
   padding: 0 ${theme.spacingXl};
-  background: linear-gradient(
-    180deg,
-    rgba(20, 20, 25, 0.98) 0%,
-    rgba(20, 20, 25, 0.95) 100%
-  );
+  background: linear-gradient(180deg, rgba(20, 20, 25, 0.98) 0%, rgba(20, 20, 25, 0.95) 100%);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid ${theme.borderSubtle};
   z-index: 100;
@@ -32,12 +30,6 @@ const HeaderLeft = styled.div`
   flex: 1;
   display: flex;
   align-items: center;
-`;
-
-const HeaderCenter = styled.div`
-  flex: 2;
-  display: flex;
-  justify-content: center;
 `;
 
 const HeaderRight = styled.div`
@@ -89,7 +81,7 @@ const StatIcon = styled.span`
   font-size: 16px;
 `;
 
-const StatValue = styled.span<{ variant?: "brains" | "coins" | "visitors" }>`
+const StatValue = styled.span<{ variant?: "brains" | "coins" | "visitors" | "reputation" }>`
   font-size: ${theme.fontSizeMd};
   font-weight: ${theme.fontWeightBold};
   font-variant-numeric: tabular-nums;
@@ -100,7 +92,9 @@ const StatValue = styled.span<{ variant?: "brains" | "coins" | "visitors" }>`
         ? theme.colorWarning
         : props.variant === "visitors"
           ? theme.colorVisitor
-          : theme.textPrimary};
+          : props.variant === "reputation"
+            ? "#ffd700"
+            : theme.textPrimary};
 `;
 
 const StatRate = styled.span`
@@ -133,7 +127,7 @@ const HeaderButton = styled.button`
   }
 `;
 
-export const Header: React.FC<Props> = ({ onHelpClick, onSettingsClick }) => {
+export const Header: React.FC<Props> = ({ onHelpClick, onSettingsClick, onAchievementsClick }) => {
   const { state } = useGame();
 
   return (
@@ -145,37 +139,40 @@ export const Header: React.FC<Props> = ({ onHelpClick, onSettingsClick }) => {
         </Logo>
       </HeaderLeft>
 
-      <HeaderCenter>
+      <HeaderRight>
         <StatGroup>
-          <Stat>
+          <Stat title="Brains">
             <StatIcon>🧠</StatIcon>
-            <StatValue variant="brains">
-              {Math.floor(state.gold).toLocaleString()}
-            </StatValue>
-            <StatRate>+{state.goldPerSecond.toFixed(1)}/s</StatRate>
+            <StatValue variant="brains">{Math.floor(state.brains).toLocaleString()}</StatValue>
+            <StatRate>+{state.brainsPerSecond.toFixed(1)}/s</StatRate>
           </Stat>
           <StatDivider />
-          <Stat>
+          <Stat title="Money">
             <StatIcon>💰</StatIcon>
-            <StatValue variant="coins">
-              ${Math.floor(state.money).toLocaleString()}
-            </StatValue>
+            <StatValue variant="coins">${Math.floor(state.money).toLocaleString()}</StatValue>
           </Stat>
           {state.visitorRate > 0 && (
             <>
               <StatDivider />
-              <Stat>
+              <Stat title="Visitor fee">
                 <StatIcon>👥</StatIcon>
-                <StatValue variant="visitors">
-                  {state.visitorRate.toFixed(1)}/s
-                </StatValue>
+                <StatValue variant="visitors">{getEntryFee(state.reputation).toFixed(1)}$</StatValue>
+              </Stat>
+            </>
+          )}
+          {state.reputation > 0 && (
+            <>
+              <StatDivider />
+              <Stat title="Reputation">
+                <StatIcon>⭐</StatIcon>
+                <StatValue variant="reputation">{state.reputation.toFixed(1)}</StatValue>
               </Stat>
             </>
           )}
         </StatGroup>
-      </HeaderCenter>
-
-      <HeaderRight>
+        <HeaderButton onClick={onAchievementsClick} title="Achievements">
+          <span>🏆</span>
+        </HeaderButton>
         <HeaderButton onClick={onHelpClick} title="Help">
           <span>?</span>
         </HeaderButton>

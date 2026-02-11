@@ -4,12 +4,14 @@ import { GameCtx, type GameCtxType } from "../../game/context";
 import { initialState } from "../../game/state";
 
 const mockGameContext: GameCtxType = {
-  state: { ...initialState(), gold: 1500, goldPerSecond: 5.5, money: 250, visitorRate: 0.3 },
+  state: { ...initialState(), brains: 1500, brainsPerSecond: 5.5, money: 250, visitorRate: 0.3 },
   buyZombie: vi.fn(),
   nextCost: vi.fn(() => 10),
   collectBrain: vi.fn(),
   spawnVisitor: vi.fn(),
-  upgradeMachine: vi.fn()
+  upgradeMachine: vi.fn(),
+  dismissAchievement: vi.fn(),
+  activateBoost: vi.fn()
 };
 
 describe("ResourcePanel", () => {
@@ -22,7 +24,7 @@ describe("ResourcePanel", () => {
     expect(screen.getByText(/1,500/)).toBeInTheDocument();
   });
 
-  it("displays gold per second production", () => {
+  it("displays brains per second production", () => {
     render(
       <GameCtx.Provider value={mockGameContext}>
         <ResourcePanel />
@@ -64,7 +66,7 @@ describe("ResourcePanel", () => {
   it("formats large numbers with locale string", () => {
     const largeContext = {
       ...mockGameContext,
-      state: { ...mockGameContext.state, gold: 1000000 }
+      state: { ...mockGameContext.state, brains: 1000000 }
     };
     render(
       <GameCtx.Provider value={largeContext}>

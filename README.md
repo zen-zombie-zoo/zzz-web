@@ -67,16 +67,17 @@ npm run test:coverage
 
 - [x] Click mechanic - Click to manually collect brains
 - [x] Upgrades system - Buy permanent production boosts
-- [ ] More zombie types - Add more tiers (bear, crocodile, frog, etc.)
+- [x] More zombie types - Add more tiers (bear, crocodile, frog, etc.)
 
 ### Progression & Retention
 
 - [ ] Prestige/Rebirth - Reset for permanent multipliers
-- [ ] Achievements - Unlock badges for milestones
+- [x] Achievements - Unlock badges for milestones
 - [ ] Milestones - Automatic bonuses at certain thresholds
 
 ### Polish & UX
 
+- [ ] Show achievement when first visitor arrives
 - [ ] Number formatting - Display large numbers (1.5K, 2.3M)
 - [ ] Buy effects - Visual feedback when purchasing
 - [ ] Sound effects - Audio for buying, achievements
