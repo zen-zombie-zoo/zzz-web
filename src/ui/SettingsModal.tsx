@@ -107,7 +107,7 @@ export const SettingsModal: React.FC = () => {
           <p>
             <strong>Zen Zombie Zoo</strong> is an idle game where you collect zombie animals to attract visitors and earn brains.
           </p>
-          <Version>Version 1.0.2</Version>
+          <Version>Version 1.1.0</Version>
         </About>
       </Section>
     </div>

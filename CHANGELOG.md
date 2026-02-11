@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/zen-zombie-zoo/zzz-web/compare/v1.0.2...v1.1.0) (2026-02-11)
+
+
+### Features
+
+* new zombie types ([#4](https://github.com/zen-zombie-zoo/zzz-web/issues/4)) ([b433ab5](https://github.com/zen-zombie-zoo/zzz-web/commit/b433ab58cc09f2fd331874bec5271656a5475ebe))
+
 ## [1.0.2](https://github.com/zen-zombie-zoo/zzz-web/compare/v1.0.1...v1.0.2) (2026-02-08)
 
 
